@@ -1,18 +1,31 @@
+set -U git_status_clean yellow
+set -U git_status_dirty -o red
+
+function git_branch_status -d 'See if there is anything to commit'
+	if test (git status 2> /dev/null | tail -n1) != 'nothing to commit, working tree clean'
+   		echo (set_color $git_status_dirty)
+	else
+   		echo (set_color $git_status_clean)
+	end
+end
+
 function fish_prompt --description 'Write out the prompt'
 
-	# Just calculate this once, to save a few cycles when displaying the prompt
-	if not set -q __fish_prompt_hostname
-		set -g __fish_prompt_hostname (hostname|cut -d . -f 1)
-	end
-
-	set -l normal (set_color normal)
-
-    # initialize our new variables
+    # Initialize colors
     set -U fish_color_user -o magenta
     set -U fish_color_local -o green
     set -U fish_color_remote -o red
     set -U fish_color_status -o yellow
 	set -l color_cwd
+	set -l normal (set_color normal)
+
+	# Just calculate this once, to save a few cycles when displaying the prompt
+	if not set -q __fish_prompt_hostname
+		set -g __fish_prompt_hostname (hostname|cut -d . -f 1)
+	end
+	if not set -q __fish_prompt_git_branch 
+		set __fish_prompt_git_branch (git_branch_status)"("(git branch ^/dev/null | grep \* | sed 's/* //')")"$normal
+	end
 
 	switch $USER
 	case root toor
@@ -44,5 +57,5 @@ function fish_prompt --description 'Write out the prompt'
     end
             
 
-	echo -n -s (set_color $fish_color_user) "$USER" $normal @ (set_color $fish_color_host) "$__fish_prompt_hostname" $normal ' ' (set_color $color_cwd) (prompt_pwd) (set_color $fish_color_status) (__fish_vcs_prompt) $normal "> "
+	echo -n -s (set_color $fish_color_user) "$USER" $normal @ (set_color $fish_color_host) "$__fish_prompt_hostname" $normal ' ' (set_color $color_cwd) (prompt_pwd) "$__fish_prompt_git_branch" $normal "> "
 end
