@@ -1,5 +1,7 @@
 # Characters
 set -g SEPARATOR ''
+set -g OK '✔'
+set -g FAILED '✘'
 
 
 function git_branch_status -d 'See if there is anything to commit'
@@ -43,6 +45,7 @@ function __is_root -d 'Check if user is root'
 end
 
 function fish_prompt --description 'Write out the prompt'
+    set -l last_status $status
 
     # Initialize colors
     set -U fish_color_bg_normal 444
@@ -60,6 +63,16 @@ function fish_prompt --description 'Write out the prompt'
 	set -l normal (set_color white)
 
 	# Just calculate this once, to save a few cycles when displaying the prompt
+    
+    # Status of last command
+    if not set -q __fish_prompt_status
+        if test $last_status -ne 0
+            set __fish_prompt_status (set_color red -b $fish_color_user)"$FAILED "
+        else
+            set __fish_prompt_status (set_color green -b $fish_color_user)"$OK "
+        end
+    end
+    # Hostname
 	if not set -q __fish_prompt_hostname
 		set -g __fish_prompt_hostname (hostname|cut -d . -f 1)
 	end
@@ -95,8 +108,8 @@ function fish_prompt --description 'Write out the prompt'
         end
 	end
 
-    # TODO Add status
-	echo -n -s (set -g current_background $fish_color_user) (set_color $fish_text_light -b $fish_color_user) "$USER"\
+	echo -n -s (set -g current_background $fish_color_user) "$__fish_prompt_status"\
+        (set_color $fish_text_light -b $fish_color_user) "$USER"\
         (__prompt_segment $fish_text_light $__fish_prompt_host_color)"$__fish_prompt_hostname"\
         (__prompt_segment $fish_text_dark $fish_color_cwd) (prompt_pwd)\
          "$__fish_prompt_git_branch"\
