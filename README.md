@@ -1,6 +1,6 @@
-# Fish prompt
+# Powerfish
 
-Customized fish prompt in inspired by [agnoster-zsh-theme](https://github.com/agnoster/agnoster-zsh-theme) showing:
+Powerfish is an elegant and informative prompt for Fish inspired by [agnoster-zsh-theme](https://github.com/agnoster/agnoster-zsh-theme) and [Powerline](https://github.com/powerline/powerline). It displays the following:
 
 * virtual environment
 * failure of previous command
@@ -9,12 +9,31 @@ Customized fish prompt in inspired by [agnoster-zsh-theme](https://github.com/ag
 * git branch
 * git status
 
+The prompt only shows information relevant to your context, so it won't clutter your screen. But enough talking, a picture is worth a thousand words:
+
+![Powerfish](prompt.png)
+
 ## Install
 
-Requires [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts) to display correctly.
+For best experience, you should use one of the [Powerline-patched fonts](https://github.com/Lokaltog/powerline-fonts).
 
-Copy `fish_prompt.fish` to `~/.config/fish/functions/`
+To install Powerfish, first clone the repository:
 
-## To do
-* better parsing of git info
-* repaint when status changes
+`git clone git@gitlab.com:radek-sprta/powerfish.git`
+
+Then copy the `fish_prompt.fish` to overwrite your current prompt.
+```
+mkdir -p ~/.config/fish/functions/
+cp fish_prompt.fish ~/.config/fish/functions/
+```
+
+## License
+
+Powerfish is licensed under GNU GPLv3.
+
+## What is coming next?
+
+Immediate goals for Powerfish are:
+
+* better parsing of Git info
+* repaint relevant parts when status changes
