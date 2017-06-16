@@ -1,36 +1,102 @@
 # Characters
-set -g SEPARATOR ''
-set -g OK '✔'
+# If Powerline modified fonts are installed, use them fir nicer output
+if not set -q __powerline_font_checked
+    set -U __powerline_font_checked (locate powerline)
+end
+if test -n $powerline_font_checked
+    set -U SEPARATOR ''
+else
+    set -U SEPARATOR ''
+end
 set -g FAILED '✘'
 set -g BRANCH ''
 
-function __prompt_segment -d 'Draw prompt segment' 
+# Initialize colors
+set -U fish_color_bg_normal 444
+set -U fish_text_light white
+set -U fish_text_dark black
+set -U git_color_untracked red
+set -U git_color_dirty yellow
+set -U git_color_clean green
+set -U fish_color_venv magenta
+set -U fish_color_user $fish_color_bg_normal
+set -U fish_color_root red
+set -U fish_color_remote yellow
+set -U fish_color_cwd blue
+
+
+function __prompt_segment -d 'Draw prompt segment'
 	set -l fg $argv[1]
-	set -l bg $argv[2]	
+	set -l bg $argv[2]
 	if not set -q current_background
-		set -g current_background 444
+		set -g current_background $fish_color_bg_normal
 	end
 	echo -n -s (set_color $current_background -b $bg) $SEPARATOR (set_color $fg -b $bg)
 	set current_background $bg
 end
 
-function __is_remote -d 'Check if shell is local or remote'
-    switch (ps --format comm= --pid %self)
-    case sshd
-        echo 'remote'
-    case '*'
-        echo 'local'
+
+function __venv_prompt -d "Write out virtual environment prompt"
+    if test -n "$VIRTUAL_ENV"
+        echo -n -s (set -g current_background $fish_color_venv)\
+                   (set_color $fish_text_light -b $fish_color_venv)" "(basename $VIRTUAL_ENV)" "
+    else
+        echo ''
     end
 end
 
-function __is_root -d 'Check if user is root'
+
+function __user_prompt -d "Write out the user prompt"
+
+    # Status of last command; calculate only once
+    if not set -q __fish_prompt_status
+        if test $last_status -ne 0
+            set __fish_prompt_status (set_color red -b $fish_color_user)"$FAILED "
+        end
+    end
+
+    # Use different colors for normal user and root
+    set -l user_status_color
+    set -l user_status_text $fish_text_light
 	switch $USER
 	case root toor
-        echo 'root'
-	case '*'
-        echo 'normal'
-	end
+        set user_status_color $fish_color_root
+    case '*'
+        set user_status_color $fish_color_user
+    end
+
+    # If we are in virtual environment, get a properly colored prompt
+    if test -n "$VIRTUAL_ENV"
+        echo (__prompt_segment $user_status_text $user_status_color)
+    else
+        echo (set -g current_background $user_status_color)
+    end
+    echo -n -s (set_color -b $user_status_color)" $__fish_prompt_status"\
+               (set_color $user_status_text)"$USER "
 end
+
+
+function __hostname_prompt -d "Write out the hostname prompt"
+
+    # Hostname, calculate just once
+	if not set -q __fish_prompt_hostname
+		set -g __fish_prompt_hostname (hostname|cut -d . -f 1)
+	end
+
+    # Only show remote hosts
+    switch (ps --format comm= --pid %self)
+    case sshd
+        echo (__prompt_segment $fish_text_dark $fish_color_remote)" at $__fish_prompt_hostname "
+    case '*'
+        echo ''
+    end
+end
+
+
+function __cwd_prompt -d "Write out current working directory"
+    echo (__prompt_segment $fish_text_dark $fish_color_cwd)" "(prompt_pwd)" "
+end
+
 
 function __git_prompt -d "Write out the git prompt"
 
@@ -60,28 +126,31 @@ function __git_prompt -d "Write out the git prompt"
     end
 
     function __count -d 'Count the various git statuses'
-        echo (echo $argv[1] | cut -d ' ' -f 1)
+        # First field is empty, use second field for count
+        echo (echo $argv[1] | cut -d ' ' -f 2)
     end
 
     if test -n (__git_branch_name)
         if test -n (__is_git_dirty)
-            for i in (git status --porcelain | cut -c 1-2 | sort | uniq -c | sed -e 's/^[[:space:]]*//')
-                switch (echo $i | cut -d ' ' -f 2)
+            # Get all info about branch
+            for i in (git status --porcelain | cut -c 1-2 | sort | uniq -c | tr -s ' ')
+                # Third field is status flag
+                switch (echo $i | cut -d ' ' -f 3)
                     case "*[ahead *"
                         set git_flags "$git_flags ⬆ "(__count $i)
-                    case "*behind *"                  
+                    case "*behind *"
                         set git_flags "$git_flags ⬇ "(__count $i)
-                    case "*A*"                         
+                    case "*A*"
                         set git_flags "$git_flags ✚ "(__count $i)
-                    case " D"                         
+                    case " D"
                         set git_flags "$git_flags ✖ "(__count $i)
-                    case "*M*"                        
+                    case "*M*"
                         set git_flags "$git_flags ● "(__count $i)
-                    case "*R*"                        
+                    case "*R*"
                         set git_flags "$git_flags ➜ "(__count $i)
-                    case "*U*"                        
+                    case "*U*"
                         set git_flags "$git_flags ═ "(__count $i)
-                    case "??"                        
+                    case "??"
                         set git_flags "$git_flags … "(__count $i)
                 end
             end
@@ -93,62 +162,24 @@ function __git_prompt -d "Write out the git prompt"
                    " $BRANCH "(__git_branch_name)"$git_flags "\
                    (__prompt_segment $git_status_color normal)
     else
+        # Not in git repo, don't print anything, just set proper colors
         echo (__prompt_segment $fish_color_cwd normal)
     end
 end
 
 function fish_prompt --description 'Write out the prompt'
-    set -l last_status $status
 
-    # Initialize colors
-    set -U fish_color_bg_normal 444
-    set -U fish_text_light white
-    set -U fish_text_dark black
-    set -U git_color_untracked red
-    set -U git_color_dirty yellow
-    set -U git_color_clean green
-    set -U fish_color_user $fish_color_bg_normal
-    set -U fish_color_root red
-    set -U fish_color_local $fish_color_bg_normal
-    set -U fish_color_remote yellow
-	set -U fish_color_cwd blue
-    set -U fish_color_root red
-	set -l color_cwd
-	set -l normal (set_color white)
+    # Save the last status
+    set -g last_status $status
 
-	# Just calculate this once, to save a few cycles when displaying the prompt
-    
-    # Status of last command
-    if not set -q __fish_prompt_status
-        if test $last_status -ne 0
-            set __fish_prompt_status (set_color red -b $fish_color_user)"$FAILED "
-        end
-    end
-    # Hostname
-	if not set -q __fish_prompt_hostname
-		set -g __fish_prompt_hostname (hostname|cut -d . -f 1)
-	end
-    # Use different colors for local and remote hosts
-    if not set -q __fish_prompt_host_color
-        switch (__is_remote)
-        case remote
-            set __fish_prompt_host_color $fish_color_remote
-        case local
-            set __fish_prompt_host_color $fish_color_local
-        end
-    end
-    # Use different colors for normal user and root
-    switch (__is_root)
-    case root
-        set fish_color_user $fish_color_root
-    case normal
-        set fish_color_user $fish_color_bg_normal
-    end
+    # Disable virtual envirnment prompt; we have our own override
+    set -U VIRTUAL_ENV_DISABLE_PROMPT 1
 
-	echo -n -s (set -g current_background $fish_color_user) "$__fish_prompt_status"\
-        (set_color $fish_text_light -b $fish_color_user) "$USER"\
-        (__prompt_segment $fish_text_light $__fish_prompt_host_color)"$__fish_prompt_hostname"\
-        (__prompt_segment $fish_text_dark $fish_color_cwd) (prompt_pwd)\
+	echo -n -s \
+        (__venv_prompt)\
+        (__user_prompt)\
+        (__hostname_prompt)\
+        (__cwd_prompt)\
         (__git_prompt)\
         (set_color normal)" "
 end

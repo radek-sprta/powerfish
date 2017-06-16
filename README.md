@@ -1,18 +1,20 @@
 # Fish prompt
 
 Customized fish prompt in inspired by [agnoster-zsh-theme](https://github.com/agnoster/agnoster-zsh-theme) showing:
+
+* virtual environment
+* failure of previous command
+* elevated priviledges
+* remote shell
 * git branch
-* whether branch is clean or dirty
-* whether we are running local or remote shell
-* whether we are root or normal user
-* status of last command
+* git status
 
 ## Install
 
 Requires [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts) to display correctly.
-Copy `fish_prompt.fish` to i`~/.config/fish/functions/`
+
+Copy `fish_prompt.fish` to `~/.config/fish/functions/`
 
 ## To do
-* more detailed info about git tree
-* render virtual environment nicer
+* better parsing of git info
 * repaint when status changes
