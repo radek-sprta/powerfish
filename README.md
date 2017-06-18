@@ -35,5 +35,4 @@ Powerfish is licensed under GNU GPLv3.
 
 Immediate goals for Powerfish are:
 
-* better parsing of Git info
 * repaint relevant parts when status changes

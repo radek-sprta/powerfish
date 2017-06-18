@@ -126,29 +126,31 @@ function __git_prompt -d "Write out the git prompt"
     end
 
     function __count -d 'Count the various git statuses'
-        # First field is empty, use second field for count
-        echo (echo $argv[1] | cut -d ' ' -f 2)
+        # First field is total count
+        echo (echo $argv[1] | cut -d ' ' -f 1)
     end
 
     if test -n (__git_branch_name)
         if test -n (__is_git_dirty)
             # Get all info about branch
-            for i in (git status --porcelain | cut -c 1-2 | sort | uniq -c | tr -s ' ')
+            for i in (git status --porcelain | cut -c 1-2 | sort | uniq -c | string trim -l)
                 # Third field is status flag
-                switch (echo $i | cut -d ' ' -f 3)
+                switch (echo $i | string sub -s 3)
                     case "*[ahead *"
                         set git_flags "$git_flags ⬆ "(__count $i)
                     case "*behind *"
                         set git_flags "$git_flags ⬇ "(__count $i)
-                    case "*A*"
+                    case "*M"
                         set git_flags "$git_flags ✚ "(__count $i)
-                    case " D"
+                    case "U*"
                         set git_flags "$git_flags ✖ "(__count $i)
-                    case "*M*"
+                    case "M*"
+                        set git_flags "$git_flags ● "(__count $i)
+                    case "A*"
                         set git_flags "$git_flags ● "(__count $i)
                     case "*R*"
                         set git_flags "$git_flags ➜ "(__count $i)
-                    case "*U*"
+                    case "*U"
                         set git_flags "$git_flags ═ "(__count $i)
                     case "??"
                         set git_flags "$git_flags … "(__count $i)
