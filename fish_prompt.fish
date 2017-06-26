@@ -84,7 +84,8 @@ function __hostname_prompt -d "Write out the hostname prompt"
 	end
 
     # Only show remote hosts
-    switch (ps --format comm= --pid %self)
+    set -l ppid (ps --format ppid= --pid %self)
+    switch (ps --format comm= --pid $ppid)
     case sshd
         echo (__prompt_segment $fish_text_dark $fish_color_remote)" at $__fish_prompt_hostname "
     case '*'
