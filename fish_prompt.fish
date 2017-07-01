@@ -15,6 +15,10 @@ set -g BRANCH ''
 set -U fish_color_bg_normal 444
 set -U fish_text_light white
 set -U fish_text_dark black
+set -U vi_color_default red
+set -U vi_color_insert green
+set -U vi_color_replace $vi_color_insert
+set -U vi_color_visual magenta
 set -U git_color_untracked red
 set -U git_color_dirty yellow
 set -U git_color_clean green
@@ -35,6 +39,42 @@ function __prompt_segment -d 'Draw prompt segment'
 	set current_background $bg
 end
 
+function fish_mode_prompt --description 'Displays the current mode'
+  # Do nothing if not in vi mode
+  if test "$fish_key_bindings" = "fish_vi_key_bindings"
+    switch $fish_bind_mode
+      case default
+        set -g current_background $vi_color_default 
+        set_color -b $vi_color_default
+        echo ' N '
+      case insert
+        set -g current_background $vi_color_insert 
+        set_color -b $vi_color_insert
+        echo ' I '
+      case replace-one
+        set -g current_background $vi_color_replace 
+        set_color -b $vi_color_replace
+        echo ' R '
+      case visual
+        set -g current_background $vi_color_visual 
+        set_color -b $vi_color_visual
+        echo ' V '
+    end
+    # If we are in virtual environment, get a properly colored prompt
+    if test -n "$VIRTUAL_ENV"
+        echo (__prompt_segment $fish_text_light $fish_color_venv)
+    # Otherwise color it according to user level
+    else
+        # TODO: Remove duplicate code
+        switch $USER
+        case root toor
+            echo (__prompt_segment $fish_text_light $fish_color_root)
+        case '*'
+            echo (__prompt_segment $fish_text_light $fish_color_user)
+        end
+    end
+  end
+end
 
 function __venv_prompt -d "Write out virtual environment prompt"
     if test -n "$VIRTUAL_ENV"
@@ -56,8 +96,8 @@ function __user_prompt -d "Write out the user prompt"
     end
 
     # Use different colors for normal user and root
-    set -l user_status_color
-    set -l user_status_text $fish_text_light
+    set -g user_status_color
+    set -g user_status_text $fish_text_light
 	switch $USER
 	case root toor
         set user_status_color $fish_color_root

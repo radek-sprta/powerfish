@@ -2,6 +2,7 @@
 
 Powerfish is an elegant and informative prompt for Fish inspired by [agnoster-zsh-theme](https://github.com/agnoster/agnoster-zsh-theme) and [Powerline](https://github.com/powerline/powerline). It displays the following:
 
+* current mode (in vi mode)
 * virtual environment
 * failure of previous command
 * elevated priviledges
@@ -35,4 +36,4 @@ Powerfish is licensed under GNU GPLv3.
 
 Immediate goals for Powerfish are:
 
-* repaint relevant parts when status changes
+* better display of git info
