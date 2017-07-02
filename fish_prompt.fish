@@ -1,15 +1,16 @@
 # Characters
-# If Powerline modified fonts are installed, use them fir nicer output
-if not set -q __powerline_font_checked
-    set -U __powerline_font_checked (locate powerline)
-end
-if test -n $powerline_font_checked
-    set -U SEPARATOR ''
-else
-    set -U SEPARATOR ''
-end
 set -g FAILED '✘'
 set -g BRANCH ''
+
+function __fish_set_separator -d "Check for Powerline font and set separator"
+    # If Powerline modified fonts are installed, use them fir nicer output
+    if type -q locate -a test -n (locate powerline)
+        set -U SEPARATOR ''
+    else
+        set -U SEPARATOR ''
+    end
+end
+
 
 # Initialize colors
 set -U fish_color_bg_normal 444
@@ -211,6 +212,11 @@ function __git_prompt -d "Write out the git prompt"
 end
 
 function fish_prompt --description 'Write out the prompt'
+    # Set separator once at the beginning
+    if not set -q __fish_separator_set
+        set -U __fish_separator_set
+        __fish_set_separator
+    end
 
     # Save the last status
     set -g last_status $status
