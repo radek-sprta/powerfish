@@ -1,6 +1,12 @@
 # Characters
-set -g FAILED '✘'
-set -g BRANCH ''
+if not set -q __powerfish_characters_initialized
+    set -U FAILED '✘'
+    set -U BRANCH ''
+    set -U UNTRACKED '…'
+    set -U MODIFIED '✚'
+    set -U STAGED '●'
+    set -U CONFLICTED '✖'
+end
 
 function __fish_set_separator -d "Check for Powerline font and set separator"
     # If Powerline modified fonts are installed, use them fir nicer output
@@ -141,6 +147,8 @@ end
 
 
 function __git_prompt -d "Write out the git prompt"
+    # Skip if git is not installed
+    type -q git; or return 1
 
     function __is_git_dirty -d 'Check if repo is dirty'
         echo (git status -s --ignore-submodules=dirty ^/dev/null)
@@ -173,37 +181,43 @@ function __git_prompt -d "Write out the git prompt"
     end
 
     if test -n (__git_branch_name)
+        set git_flags ''
         if test -n (__is_git_dirty)
+            # Initialize counters
+            set -l untracked 0
+            set -l modified 0
+            set -l staged 0
+            set -l conflicted 0
             # Get all info about branch
             for i in (git status --porcelain | cut -c 1-2 | sort | uniq -c | string trim -l)
                 # Third field is status flag
                 switch (echo $i | string sub -s 3)
-                    case "*[ahead *"
-                        set git_flags "$git_flags ⬆ "(__count $i)
-                    case "*behind *"
-                        set git_flags "$git_flags ⬇ "(__count $i)
-                    case "*M"
-                        set git_flags "$git_flags ✚ "(__count $i)
-                    case "U*"
-                        set git_flags "$git_flags ✖ "(__count $i)
-                    case "M*"
-                        set git_flags "$git_flags ● "(__count $i)
-                    case "A*"
-                        set git_flags "$git_flags ● "(__count $i)
-                    case "*R*"
-                        set git_flags "$git_flags ➜ "(__count $i)
-                    case "*U"
-                        set git_flags "$git_flags ═ "(__count $i)
+                    case "U?" "?U" "DD" "AA"
+                        set conflicted (math $conflicted+(__count $i))
+                    case "?M" "?D"
+                        set modified (math $modified+(__count $i))
                     case "??"
-                        set git_flags "$git_flags … "(__count $i)
+                        set untracked (math $untracked+(__count $i))
+                    case "*"
+                        set staged (math $staged+(__count $i))
                 end
             end
-        else
-            set git_flags ""
+            if test $untracked -gt 0
+                set git_flags "$UNTRACKED $untracked " 
+            end
+            if test $modified -gt 0
+                set git_flags "$MODIFIED $modified " 
+            end
+            if test $staged -gt 0
+                set git_flags "$STAGED $staged " 
+            end
+            if test $conflicted -gt 0
+                set git_flags "$CONFLICTED $conflicted " 
+            end
         end
         __set_git_color
         echo -n -s (__prompt_segment $git_status_text $git_status_color)\
-                   " $BRANCH "(__git_branch_name)"$git_flags "\
+                   " $BRANCH "(__git_branch_name)" $git_flags"\
                    (__prompt_segment $git_status_color normal)
     else
         # Not in git repo, don't print anything, just set proper colors

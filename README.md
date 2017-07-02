@@ -36,4 +36,6 @@ Powerfish is licensed under GNU GPLv3.
 
 Immediate goals for Powerfish are:
 
-* better display of git info
+* show number of stashed files in git repo
+* show number of renamed files in git repo
+* show how much is git ahead/behind remote
