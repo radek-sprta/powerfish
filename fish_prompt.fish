@@ -8,6 +8,8 @@ if not set -q __powerfish_characters_initialized
     set -U STAGED '●'
     set -U CONFLICTED '✖'
     set -U STASHED '⚑'
+    set -U AHEAD '⬆'
+    set -U BEHIND '⬇'
 end
 
 function __fish_set_separator -d "Check for Powerline font and set separator"
@@ -180,6 +182,26 @@ function __git_prompt -d "Write out the git prompt"
         end
     end
 
+    function __get_divergence -d 'Get divergence between local and remote'
+        set -l branch_info (git status --porcelain --branch)[1]
+        set -l branch_ahead (string match -r '\[ahead (\d*)' $branch_info)
+        set -l branch_behind (string match -r 'behind (\d*)\]' $branch_info)
+        # Check how much we are ahead
+        if test (count $branch_ahead) -eq 2; and test $branch_ahead[2] -gt 0
+            set divergence "$AHEAD $branch_ahead[2]"
+        end
+        # Check how much we are behind
+        if test (count $branch_behind) -eq 2; and test $branch_behind[2] -gt 0
+            set divergence "$divergence $BEHIND $branch_behind[2]"
+        end
+        # Padding
+        if test -n "$divergence"
+            echo " $divergence"
+        else
+            echo ""
+        end
+    end
+
     function __count -d 'Count the various git statuses'
         # First field is total count
         echo (echo $argv[1] | cut -d ' ' -f 1)
@@ -209,7 +231,7 @@ function __git_prompt -d "Write out the git prompt"
                 end
             end
             # Get number of stashed files
-            set stashed (math $stashed+(git stash list | wc -l))
+            set stashed (math $stashed+(git stash list | wc --lines))
              
             if test $untracked -gt 0
                 set git_flags "$UNTRACKED $untracked " 
@@ -229,7 +251,7 @@ function __git_prompt -d "Write out the git prompt"
         end
         __set_git_color
         echo -n -s (__prompt_segment $git_status_text $git_status_color)\
-                   " $BRANCH "(__git_branch_name)" $git_flags"\
+                   " $BRANCH "(__git_branch_name)(__get_divergence)" $git_flags"\
                    (__prompt_segment $git_status_color normal)
     else
         # Not in git repo, don't print anything, just set proper colors
