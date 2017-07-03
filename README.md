@@ -7,8 +7,10 @@ Powerfish is an elegant and informative prompt for Fish inspired by [agnoster-zs
 * failure of previous command
 * elevated priviledges
 * remote shell
+* current working directory
 * git branch
-* git status
+* how much git is ahead/behind remote
+* number of untracked/modified/staged/conflicted/stashed files in git
 
 The prompt only shows information relevant to your context, so it won't clutter your screen. But enough talking, a picture is worth a thousand words:
 
@@ -36,6 +38,4 @@ Powerfish is licensed under GNU GPLv3.
 
 Immediate goals for Powerfish are:
 
-* show number of stashed files in git repo
-* show number of renamed files in git repo
-* show how much is git ahead/behind remote
+* better color coding of git branch
