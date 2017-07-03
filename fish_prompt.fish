@@ -1,11 +1,13 @@
 # Characters
 if not set -q __powerfish_characters_initialized
+    set -U __powerfish_characters_initialized
     set -U FAILED '✘'
     set -U BRANCH ''
     set -U UNTRACKED '…'
     set -U MODIFIED '✚'
     set -U STAGED '●'
     set -U CONFLICTED '✖'
+    set -U STASHED '⚑'
 end
 
 function __fish_set_separator -d "Check for Powerline font and set separator"
@@ -18,22 +20,25 @@ function __fish_set_separator -d "Check for Powerline font and set separator"
 end
 
 
-# Initialize colors
-set -U fish_color_bg_normal 444
-set -U fish_text_light white
-set -U fish_text_dark black
-set -U vi_color_default red
-set -U vi_color_insert green
-set -U vi_color_replace $vi_color_insert
-set -U vi_color_visual magenta
-set -U git_color_untracked red
-set -U git_color_dirty yellow
-set -U git_color_clean green
-set -U fish_color_venv magenta
-set -U fish_color_user $fish_color_bg_normal
-set -U fish_color_root red
-set -U fish_color_remote yellow
-set -U fish_color_cwd blue
+# Colors
+if not set -q __powerfish_colors_initialized
+    set -U __powerfish_colors_initialized
+    set -U fish_color_bg_normal 444
+    set -U fish_text_light white
+    set -U fish_text_dark black
+    set -U vi_color_default red
+    set -U vi_color_insert green
+    set -U vi_color_replace $vi_color_insert
+    set -U vi_color_visual magenta
+    set -U git_color_untracked red
+    set -U git_color_dirty yellow
+    set -U git_color_clean green
+    set -U fish_color_venv magenta
+    set -U fish_color_user $fish_color_bg_normal
+    set -U fish_color_root red
+    set -U fish_color_remote yellow
+    set -U fish_color_cwd blue
+end
 
 
 function __prompt_segment -d 'Draw prompt segment'
@@ -188,6 +193,7 @@ function __git_prompt -d "Write out the git prompt"
             set -l modified 0
             set -l staged 0
             set -l conflicted 0
+            set -l stashed 0
             # Get all info about branch
             for i in (git status --porcelain | cut -c 1-2 | sort | uniq -c | string trim -l)
                 # Third field is status flag
@@ -196,23 +202,29 @@ function __git_prompt -d "Write out the git prompt"
                         set conflicted (math $conflicted+(__count $i))
                     case "?M" "?D"
                         set modified (math $modified+(__count $i))
-                    case "??"
+                    case '??'
                         set untracked (math $untracked+(__count $i))
                     case "*"
                         set staged (math $staged+(__count $i))
                 end
             end
+            # Get number of stashed files
+            set stashed (math $stashed+(git stash list | wc -l))
+             
             if test $untracked -gt 0
                 set git_flags "$UNTRACKED $untracked " 
             end
             if test $modified -gt 0
-                set git_flags "$MODIFIED $modified " 
+                set git_flags "$git_flags$MODIFIED $modified " 
             end
             if test $staged -gt 0
-                set git_flags "$STAGED $staged " 
+                set git_flags "$git_flags$STAGED $staged " 
             end
             if test $conflicted -gt 0
-                set git_flags "$CONFLICTED $conflicted " 
+                set git_flags "$git_flags$CONFLICTED $conflicted " 
+            end
+            if test $stashed -gt 0
+                set git_flags "$git_flags$STASHED $stashed "
             end
         end
         __set_git_color
@@ -226,7 +238,7 @@ function __git_prompt -d "Write out the git prompt"
 end
 
 function fish_prompt --description 'Write out the prompt'
-    # Set separator once at the beginning
+    # Set separator once at start
     if not set -q __fish_separator_set
         set -U __fish_separator_set
         __fish_set_separator
