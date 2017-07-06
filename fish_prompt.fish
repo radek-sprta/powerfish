@@ -5,6 +5,7 @@ if not set --query __powerfish_characters_initialized
     set --universal BEHIND '⬇'
     set --universal BRANCH ''
     set --universal CONFLICTED '✖'
+    set --universal DETACHED '➦'
     set --universal FAILED '✘'
     set --universal JOBS '⚙'
     set --universal MODIFIED '✚'
@@ -189,7 +190,25 @@ function __git_prompt -d "Write out the git prompt"
     type --quiet git; or return 1
 
     function __git_branch_name -d 'Get branch name'
-        printf "%s " (string match --regex '## (.*)\.{3}' $git_status)[2]
+        # Not on a branch
+        if string match --regex 'no branch' $git_status >/dev/null
+            printf "%s %s " $DETACHED (__get_tag_or_hash)
+        # Initial commit
+        else if set branch_name (string match --regex 'commit on (.*)' $git_status)
+            printf "%s %s " $BRANCH $branch_name[2]
+        # Otherwise get a branch name normally
+        else
+            printf "%s %s " $BRANCH (string match --regex '## ([^.]*)' $git_status)[2]
+        end
+    end
+
+    function __get_tag_or_hash -d 'Get tag or hash'
+        if set --local tag (git describe --tags --exact-match ^/dev/null)
+            printf "%s" $tag
+        else
+            # Tag does not match, print a hash
+            printf "%s" (git rev-parse --short HEAD)
+        end
     end
 
     function __set_git_color -d 'Set color depending on the tree status'
@@ -276,11 +295,10 @@ function __git_prompt -d "Write out the git prompt"
     end
 
     # Get git repo status
-    set --global git_status (git status --porcelain --branch --ignore-submodules=dirty ^/dev/null)
-    if test -n "$git_status"
+    if set --global git_status (git status --porcelain --branch --ignore-submodules=dirty ^/dev/null)
         __set_git_color
-        printf "%s %s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
-                   $BRANCH (__git_branch_name) (__get_divergence) (__get_git_flags)
+        printf "%s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
+                           (__git_branch_name) (__get_divergence) (__get_git_flags)
     end
 end
 

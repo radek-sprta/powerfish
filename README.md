@@ -7,13 +7,13 @@ Powerfish is an elegant and informative prompt for Fish inspired by [agnoster-zs
 * failure of previous command
 * number of background jobs
 * elevated priviledges
-* remote shell
+* remote host
 * current working directory
-* git branch
+* git branch or detached head state
 * how much git is ahead/behind remote
 * number of untracked/modified/staged/conflicted/stashed files in git
 
-The prompt only shows information relevant to your context, so it won't clutter your screen. But enough talking, a picture is worth a thousand words:
+The prompt only shows information relevant to the context, so it won't clutter your screen. But enough talking, a picture is worth a thousand words:
 
 ![Powerfish](prompt.png)
 
@@ -40,5 +40,5 @@ Powerfish is licensed under GNU GPLv3.
 Immediate goals for Powerfish are:
 
 * better color coding of git branch
-* show detached head state
 * integrate to fisherman
+* support for multiple color themes
