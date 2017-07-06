@@ -21,6 +21,7 @@ function __fish_set_separator -d "Check for Powerline font and set separator"
     end
 end
 
+
 # Colors
 if not set --query __powerfish_colors_initialized
     set --universal __powerfish_colors_initialized
@@ -54,6 +55,7 @@ function __prompt_separator -d 'Draw prompt segment'
 	set current_background $bg
 end
 
+
 function __prompt_start -d 'Start the prompt'
     # Argv[1]: Head of prompt.
     # Argv[2]: Background color.
@@ -65,10 +67,12 @@ function __prompt_start -d 'Start the prompt'
     end
 end
 
+
 function __prompt_end -d 'End the prompt'
         printf "%s " (__prompt_separator normal normal)
         set -e prompt_head
 end
+
 
 function fish_mode_prompt --description 'Displays the current mode'
     # Do nothing if not in vi mode
@@ -80,7 +84,7 @@ function fish_mode_prompt --description 'Displays the current mode'
           case default
             set --global current_background $fish_color_vi_default
             set_color --background $fish_color_vi_default
-            printf " %s " 'N' 
+            printf " %s " 'N'
           case insert
             set --global current_background $fish_color_vi_insert
             set_color --background $fish_color_vi_insert
@@ -96,6 +100,7 @@ function fish_mode_prompt --description 'Displays the current mode'
         end
     end
 end
+
 
 function __venv_prompt -d "Write out virtual environment prompt"
     # Do nothing if not in virtual environment
@@ -149,16 +154,16 @@ function __hostname_prompt -d "Write out the hostname prompt"
 
     # Hostname, calculate just once
 	if not set --query __fish_prompt_hostname
-		set --global __fish_prompt_hostname (hostname|cut -d . -f 1)
+		set --global __fish_prompt_hostname (hostname | string split .)[1]
 	end
 
     # Only show remote hosts
-    set --local ppid (ps --format ppid= --pid %self | tr -d '[:space:]')
+    set --local ppid (ps --format ppid= --pid %self | string trim)
     switch (ps --format comm= --pid $ppid)
     case sshd mosh-server
-        echo (__prompt_separator $fish_text_dark $fish_color_remote)" at $__fish_prompt_hostname "
-    case '*'
-        echo ''
+        printf "%s at %s "\
+            (__prompt_separator $fish_text_dark $fish_color_remote)\
+            $__fish_prompt_hostname
     end
 end
 
@@ -268,6 +273,7 @@ function __git_prompt -d "Write out the git prompt"
                    $BRANCH (__git_branch_name) (__get_divergence) (__get_git_flags)
     end
 end
+
 
 function fish_prompt --description 'Write out the prompt'
     # Save the last status
