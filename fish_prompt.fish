@@ -6,6 +6,7 @@ if not set --query __powerfish_characters_initialized
     set --universal BRANCH ''
     set --universal CONFLICTED '✖'
     set --universal FAILED '✘'
+    set --universal JOBS '⚙'
     set --universal MODIFIED '✚'
     set --universal STAGED '●'
     set --universal STASHED '⚑'
@@ -123,8 +124,16 @@ function __user_prompt -d "Write out the user prompt"
     # Status of last command
     function __fish_prompt_status -d "Show if the last command failed"
         if test $last_status -ne 0
-            set_color $fish_color_failed --background $fish_color_user
+            set_color $fish_color_failed --background $user_status_color
             printf "%s " $FAILED
+        end
+    end
+
+    function __fish_prompt_jobs -d "Show the number of background jobs"
+        set -l bg_jobs (jobs | wc --lines)
+        if test "$bg_jobs" -gt 0
+            set_color $user_status_text --background $user_status_color
+            printf "%s %s " $JOBS $bg_jobs
         end
     end
 
@@ -146,7 +155,8 @@ function __user_prompt -d "Write out the user prompt"
     end
 
     set_color --background $user_status_color
-    printf " %s%s%s " (__fish_prompt_status) (set_color $user_status_text) $USER
+    printf " %s%s%s%s " (__fish_prompt_status) (__fish_prompt_jobs)\
+                        (set_color $user_status_text) $USER
 end
 
 

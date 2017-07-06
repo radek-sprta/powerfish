@@ -5,6 +5,7 @@ Powerfish is an elegant and informative prompt for Fish inspired by [agnoster-zs
 * current mode (in vi mode)
 * virtual environment
 * failure of previous command
+* number of background jobs
 * elevated priviledges
 * remote shell
 * current working directory
@@ -39,3 +40,5 @@ Powerfish is licensed under GNU GPLv3.
 Immediate goals for Powerfish are:
 
 * better color coding of git branch
+* show detached head state
+* integrate to fisherman
