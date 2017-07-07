@@ -40,6 +40,7 @@ Powerfish is licensed under GNU GPLv3.
 
 Immediate goals for Powerfish are:
 
-* better color coding of git branch
+* option to disable counts and just show git flags
+* support for multiple color themes (namely solarized and tomorrow night bright)
 * integrate to fisherman
-* support for multiple color themes
+* show connection through telnet in red

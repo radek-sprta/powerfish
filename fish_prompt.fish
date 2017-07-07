@@ -1,7 +1,7 @@
 # Configuration:
 # You can override some default options in ~/.config/fish/config.fish
 #
-#   set -g __fish_always_show_user true
+#   set -g DEFAULT_USER username    # Hide default username
 
 # Characters
 if not set --query __powerfish_characters_initialized
@@ -36,8 +36,8 @@ if not set --query __powerfish_colors_initialized
     set --universal fish_color_cwd blue
     set --universal fish_color_failed red
     set --universal fish_color_git_clean green
+    set --universal fish_color_git_conflicted red
     set --universal fish_color_git_dirty yellow
-    set --universal fish_color_git_untracked red
     set --universal fish_color_root red
     set --universal fish_color_remote yellow
     set --universal fish_color_user $fish_color_bg_normal
@@ -164,15 +164,14 @@ end
 function __user_prompt -d "Write out the user prompt"
 
     # If we are under default user, do nothing
-    if test "$USER" != "$DEFAULT_USER"; or set --query __fish_always_show_user
+    if test "$USER" != "$DEFAULT_USER"
 
         # Use different colors for normal user and root
         set --global user_status_color
         set --global user_status_text $fish_text_light
-        switch $USER
-        case root toor
+        if test (id -u $USER) -eq 0
             set user_status_color $fish_color_root
-        case '*'
+        else
             set user_status_color $fish_color_user
         end
 
@@ -243,9 +242,8 @@ function __git_prompt -d "Write out the git prompt"
     function __set_git_color -d 'Set color depending on the tree status'
         # If there are more lines than just the branch line, repo is dirty
         if test (count $git_status) -gt 1
-            # Check if there are untracked files
-            if string match --regex '\?\? ' $git_status >/dev/null ^/dev/null
-                set --global git_status_color $fish_color_git_untracked
+            if string match --regex 'U\?|\?U|DD|AA ' $git_status >/dev/null
+                set --global git_status_color $fish_color_git_conflicted
                 set --global git_status_text $fish_text_light
             else
                 set --global git_status_color $fish_color_git_dirty
