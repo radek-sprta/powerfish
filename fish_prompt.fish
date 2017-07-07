@@ -2,6 +2,7 @@
 # You can override some default options in ~/.config/fish/config.fish
 #
 #   set -g DEFAULT_USER username    # Hide default username
+#   set -g __fish_no_count true     # Don't show count for git flags etc.
 
 # Characters
 if not set --query __powerfish_characters_initialized
@@ -81,6 +82,10 @@ function __prompt_end -d 'End the prompt'
 end
 
 
+function __remove_count -d 'Remove count'
+    printf "%s" (string replace --all --regex ' [0-9]' '' $argv[1])
+end
+
 function fish_mode_prompt --description 'Displays the current mode'
     # Do nothing if not in vi mode
     if test "$fish_key_bindings" = "fish_vi_key_bindings"
@@ -140,7 +145,11 @@ function __status_prompt -d "Show status of last command and background jobs"
             echo (__prompt_separator $fish_text_light $fish_color_user)
         end
 
-        printf " %s%s" $command_status $jobs_status
+        if set --query __fish_no_count
+            printf " %s%s" $command_status (__remove_count $jobs_status)
+        else
+            printf " %s%s" $command_status $jobs_status
+        end
     end
 end
 
@@ -302,30 +311,36 @@ function __git_prompt -d "Write out the git prompt"
         set stashed (git stash list | wc --lines)
 
         if test $untracked -gt 0
-            set git_flags "$UNTRACKED $untracked"
+            set git_flags "$UNTRACKED $untracked "
         end
         if test $modified -gt 0
-            set git_flags "$git_flags$MODIFIED $modified"
+            set git_flags "$git_flags$MODIFIED $modified "
         end
         if test $staged -gt 0
-            set git_flags "$git_flags$STAGED $staged"
+            set git_flags "$git_flags$STAGED $staged "
         end
         if test $conflicted -gt 0
-            set git_flags "$git_flags$CONFLICTED $conflicted"
+            set git_flags "$git_flags$CONFLICTED $conflicted "
         end
         if test $stashed -gt 0
-            set git_flags "$git_flags$STASHED $stashed"
+            set git_flags "$git_flags$STASHED $stashed "
         end
         if set --query git_flags
-            printf "%s " $git_flags
+            printf "%s" $git_flags
         end
     end
 
     # Get git repo status
     if set --global git_status (git status --porcelain --branch --ignore-submodules=dirty ^/dev/null)
         __set_git_color
-        printf "%s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
-                           (__git_branch_name) (__get_divergence) (__get_git_flags)
+        if set --query __fish_no_count
+            printf "%s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
+                (__git_branch_name) (__remove_count (__get_divergence))\
+                (__remove_count (__get_git_flags))
+        else
+            printf "%s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
+                (__git_branch_name) (__get_divergence) (__get_git_flags)
+        end
     end
 end
 
