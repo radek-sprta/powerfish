@@ -1,3 +1,8 @@
+# Configuration:
+# You can override some default options in ~/.config/fish/config.fish
+#
+#   set -g __fish_always_show_user true
+
 # Characters
 if not set --query __powerfish_characters_initialized
     set --universal __powerfish_characters_initialized
@@ -104,6 +109,42 @@ function fish_mode_prompt --description 'Displays the current mode'
 end
 
 
+function __status_prompt -d "Show status of last command and background jobs"
+
+    function __fish_prompt_status -d "Show if the last command failed"
+        if test $last_status -ne 0
+            set_color $fish_color_failed --background $fish_color_user
+            printf "%s " $FAILED
+            set_color $fish_text_light
+        end
+    end
+
+    function __fish_prompt_jobs -d "Show the number of background jobs"
+        set --local bg_jobs (jobs | wc --lines)
+        if test "$bg_jobs" -gt 0
+            set_color $fish_text_light --background $fish_color_user
+            printf "%s %s " $JOBS $bg_jobs
+        end
+    end
+
+    set --local command_status (__fish_prompt_status)
+    set --local jobs_status (__fish_prompt_jobs)
+
+    # If there is nothing to show, dont draw the prompt
+    if test -n "$command_status" -o -n "$jobs_status"
+
+        # Start the prompt if necessary, otherwise just draw separator
+        if not set --query prompt_head
+            __prompt_start "status" $fish_color_user
+        else
+            echo (__prompt_separator $fish_text_light $fish_color_user)
+        end
+
+        printf " %s%s" $command_status $jobs_status
+    end
+end
+
+
 function __venv_prompt -d "Write out virtual environment prompt"
     # Do nothing if not in virtual environment
     if test -n "$VIRTUAL_ENV"
@@ -122,42 +163,30 @@ end
 
 function __user_prompt -d "Write out the user prompt"
 
-    # Status of last command
-    function __fish_prompt_status -d "Show if the last command failed"
-        if test $last_status -ne 0
-            set_color $fish_color_failed --background $user_status_color
-            printf "%s " $FAILED
+    # If we are under default user, do nothing
+    if test "$USER" != "$DEFAULT_USER"; or set --query __fish_always_show_user
+
+        # Use different colors for normal user and root
+        set --global user_status_color
+        set --global user_status_text $fish_text_light
+        switch $USER
+        case root toor
+            set user_status_color $fish_color_root
+        case '*'
+            set user_status_color $fish_color_user
         end
-    end
 
-    function __fish_prompt_jobs -d "Show the number of background jobs"
-        set -l bg_jobs (jobs | wc --lines)
-        if test "$bg_jobs" -gt 0
-            set_color $user_status_text --background $user_status_color
-            printf "%s %s " $JOBS $bg_jobs
+        # Start the prompt if necessary, otherwise just draw separator
+        if not set --query prompt_head
+            __prompt_start "user" $user_status_color
+        else
+            echo (__prompt_separator $user_status_text $user_status_color)
         end
-    end
 
-    # Use different colors for normal user and root
-    set --global user_status_color
-    set --global user_status_text $fish_text_light
-	switch $USER
-	case root toor
-        set user_status_color $fish_color_root
-    case '*'
-        set user_status_color $fish_color_user
+        set_color --background $user_status_color
+        printf " %s%s%s%s " (__fish_prompt_status) (__fish_prompt_jobs)\
+                                (set_color $user_status_text) $USER
     end
-
-    # Start the prompt if necessary, otherwise just draw separator
-    if not set --query prompt_head
-        __prompt_start "user" $user_status_color
-    else
-        echo (__prompt_separator $user_status_text $user_status_color)
-    end
-
-    set_color --background $user_status_color
-    printf " %s%s%s%s " (__fish_prompt_status) (__fish_prompt_jobs)\
-                        (set_color $user_status_text) $USER
 end
 
 
@@ -317,6 +346,7 @@ function fish_prompt --description 'Write out the prompt'
     set --universal VIRTUAL_ENV_DISABLE_PROMPT 1
 
 	printf "%s%s%s%s%s%s" \
+        (__status_prompt)\
         (__venv_prompt)\
         (__user_prompt)\
         (__hostname_prompt)\

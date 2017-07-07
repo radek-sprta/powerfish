@@ -6,6 +6,7 @@ Powerfish is an elegant and informative prompt for Fish inspired by [agnoster-zs
 * virtual environment
 * failure of previous command
 * number of background jobs
+* non-default user
 * elevated priviledges
 * remote host
 * current working directory
