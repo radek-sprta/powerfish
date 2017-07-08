@@ -11,6 +11,7 @@
 #   set -g __fish_color_theme default|tomorrow-night|solarized-dark
 
 # Characters
+
 if not set --query __powerfish_characters_initialized
     set --universal __powerfish_characters_initialized
     set --universal AHEAD '⬆'
@@ -37,7 +38,10 @@ end
 
 
 # Colors
+
 function __fish_set_color_theme -d 'Set color theme'
+    # Argv[1]: Name of color theme to set
+
     switch "$argv[1]"
         case tomorrow-night
             __fish_set_colors_tomorrow
@@ -127,6 +131,7 @@ function __fish_set_colors_solarized -d 'Set Solarized Dark color theme'
 end
 
 
+# Set color theme
 if not set --query __fish_current_theme; or set --query __fish_color_theme
     # If user set theme is the same as current theme, do nothing
     if test -z "$__fish_current_theme" -o "$__fish_current_theme" != "$__fish_color_theme"
@@ -135,32 +140,33 @@ if not set --query __fish_current_theme; or set --query __fish_color_theme
 end
 
 
-function __prompt_separator -d 'Draw prompt segment'
-    # Argv[1]: Foreground color.
-    # Argv[2]: Background color.
+# Prompt builders
 
-	set --local fg $argv[1]
-	set --local bg $argv[2]
-	printf "%s%s%s" (set_color $current_background --background $bg)\
-                    $SEPARATOR (set_color $fg --background $bg)
-	set current_background $bg
-end
-
-
-function __prompt_start -d 'Start the prompt'
+function __prompt_segment -d 'Draw prompt segment'
     # Argv[1]: Head of prompt.
-    # Argv[2]: Background color.
+    # Argv[2]: Foreground color.
+    # Argv[3]: Background color.
 
-    # Do nothing if prompt has already started
+    set --local head $argv[1]
+	set --local fg $argv[2]
+	set --local bg $argv[3]
+
+
+    # Start the prompt if necessary, otherwise just draw separator
     if not set --query prompt_head
-        set --global prompt_head $argv[1]
-        set --global current_background $argv[2]
+        set --global prompt_head $head
+        set_color $fg --background $bg
+    else
+        printf "%s%s%s" (set_color $current_background --background $bg)\
+            $SEPARATOR (set_color $fg --background $bg)
     end
+
+    set --global current_background $bg
 end
 
 
 function __prompt_end -d 'End the prompt'
-        printf "%s " (__prompt_separator normal normal)
+        printf "%s " (__prompt_segment "" normal normal)
         set --erase prompt_head
 end
 
@@ -172,26 +178,18 @@ end
 function fish_mode_prompt --description 'Displays the current mode'
     # Do nothing if not in vi mode
     if test "$fish_key_bindings" = "fish_vi_key_bindings"
-        # Start the prompt, since vi mode always comes first
-        __prompt_start "vi" normal
-
-        set_color $fish_text_light
         switch $fish_bind_mode
           case default
-            set --global current_background $fish_color_vi_default
-            set_color --background $fish_color_vi_default
+            __prompt_segment "vi" $fish_text_light $fish_color_vi_default
             printf " %s " 'N'
           case insert
-            set --global current_background $fish_color_vi_insert
-            set_color --background $fish_color_vi_insert
+            __prompt_segment "vi" $fish_text_light $fish_color_vi_insert
             printf " %s " 'I'
           case replace-one
-            set --global current_background $fish_color_vi_replace
-            set_color --background $fish_color_vi_replace
+            __prompt_segment "vi" $fish_text_light $fish_color_vi_replace
             printf " %s " 'R'
           case visual
-            set --global current_background $fish_color_vi_visual
-            set_color --background $fish_color_vi_visual
+            __prompt_segment "vi" $fish_text_light $fish_color_vi_visual
             printf " %s " 'V'
         end
     end
@@ -202,16 +200,15 @@ function __status_prompt -d "Show status of last command and background jobs"
 
     function __fish_prompt_status -d "Show if the last command failed"
         if test $last_status -ne 0
-            set_color $fish_color_failed --background $fish_color_user
+            set_color $fish_color_failed
             printf "%s " $FAILED
-            set_color $fish_text_light
         end
     end
 
     function __fish_prompt_jobs -d "Show the number of background jobs"
         set --local bg_jobs (jobs | wc --lines)
         if test "$bg_jobs" -gt 0
-            set_color $fish_color_jobs --background $fish_color_user
+            set_color $fish_color_jobs
             printf "%s %s " $JOBS $bg_jobs
         end
     end
@@ -222,13 +219,7 @@ function __status_prompt -d "Show status of last command and background jobs"
     # If there is nothing to show, dont draw the prompt
     if test -n "$command_status" -o -n "$jobs_status"
 
-        # Start the prompt if necessary, otherwise just draw separator
-        if not set --query prompt_head
-            __prompt_start "status" $fish_color_user
-        else
-            echo (__prompt_separator $fish_text_light $fish_color_user)
-        end
-
+        __prompt_segment "status" $fish_text_light $fish_color_user
         if set --query __fish_no_count
             printf " %s%s" $command_status (__remove_count $jobs_status)
         else
@@ -241,14 +232,7 @@ end
 function __venv_prompt -d "Write out virtual environment prompt"
     # Do nothing if not in virtual environment
     if test -n "$VIRTUAL_ENV"
-        # Start the prompt if necessary, otherwise just draw separator
-        if not set --query prompt_head
-            __prompt_start "venv" $fish_color_venv
-        else
-            printf "%s" (__prompt_separator $fish_text_light $fish_color_venv)
-        end
-
-        set_color $fish_text_light --background $fish_color_venv
+        __prompt_segment "venv" $fish_text_light $fish_color_venv
         printf " %s " (basename $VIRTUAL_ENV)
     end
 end
@@ -268,15 +252,8 @@ function __user_prompt -d "Write out the user prompt"
             set user_status_color $fish_color_user
         end
 
-        # Start the prompt if necessary, otherwise just draw separator
-        if not set --query prompt_head
-            __prompt_start "user" $user_status_color
-        else
-            echo (__prompt_separator $user_status_text $user_status_color)
-        end
-
-        set_color --background $user_status_color
-        printf " %s%s " (set_color $user_status_text) $USER
+        __prompt_segment "user" $user_status_text $user_status_color
+        printf " %s " $USER
     end
 end
 
@@ -300,8 +277,8 @@ end
 
 
 function __cwd_prompt -d "Write out current working directory"
-    printf "%s %s " (__prompt_separator $fish_text_dark $fish_color_cwd)\
-                    (prompt_pwd)
+    __prompt_segment "cwd" $fish_text_dark $fish_color_cwd
+    printf " %s " (prompt_pwd)
 end
 
 
@@ -416,13 +393,13 @@ function __git_prompt -d "Write out the git prompt"
     # Get git repo status
     if set --global git_status (git status --porcelain --branch --ignore-submodules=dirty ^/dev/null)
         __set_git_color
+        __prompt_segment "git" $git_status_text $git_status_color
         if set --query __fish_no_count
-            printf "%s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
-                (__git_branch_name) (__remove_count (__get_divergence))\
+            printf " %s%s%s" (__git_branch_name)\
+                (__remove_count (__get_divergence))\
                 (__remove_count (__get_git_flags))
         else
-            printf "%s %s%s%s" (__prompt_separator $git_status_text $git_status_color) \
-                (__git_branch_name) (__get_divergence) (__get_git_flags)
+            printf " %s%s%s" (__git_branch_name) (__get_divergence) (__get_git_flags)
         end
     end
 end
