@@ -1,8 +1,14 @@
 # Configuration:
 # You can override some default options in ~/.config/fish/config.fish
 #
-#   set -g DEFAULT_USER username    # Hide default username
-#   set -g __fish_no_count true     # Don't show count for git flags etc.
+#   # Hide default username
+#   set -g DEFAULT_USER username
+#
+#   # Don't show counters for git flags etc.
+#   set -g __fish_no_count true
+#
+#   # Change the color theme
+#   set -g __fish_color_theme default|tomorrow-night|solarized-dark
 
 # Characters
 if not set --query __powerfish_characters_initialized
@@ -31,24 +37,101 @@ end
 
 
 # Colors
-if not set --query __powerfish_colors_initialized
-    set --universal __powerfish_colors_initialized
+function __fish_set_color_theme -d 'Set color theme'
+    switch "$argv[1]"
+        case tomorrow-night
+            __fish_set_colors_tomorrow
+        case solarized-dark
+            __fish_set_colors_solarized
+        case "*"
+            __fish_set_colors_default
+    end
+end
+
+
+function __fish_set_colors_default -d 'Set default color theme'
+    set --universal fish_current_theme 'default'
+
     set --universal fish_color_bg_normal 444
+    set --universal fish_text_light white
+    set --universal fish_text_dark black
+
     set --universal fish_color_cwd blue
     set --universal fish_color_failed red
-    set --universal fish_color_git_clean green
-    set --universal fish_color_git_conflicted red
-    set --universal fish_color_git_dirty yellow
+    set --universal fish_color_jobs $fish_text_light
     set --universal fish_color_root red
     set --universal fish_color_remote yellow
     set --universal fish_color_user $fish_color_bg_normal
     set --universal fish_color_venv magenta
+
+    set --universal fish_color_git_clean green
+    set --universal fish_color_git_conflicted red
+    set --universal fish_color_git_dirty yellow
+
     set --universal fish_color_vi_default red
     set --universal fish_color_vi_insert green
     set --universal fish_color_vi_replace $fish_color_vi_insert
     set --universal fish_color_vi_visual magenta
-    set --universal fish_text_light white
-    set --universal fish_text_dark black
+end
+
+
+function __fish_set_colors_tomorrow -d 'Set Tommorrow Night color theme'
+    set --universal fish_current_theme 'tomorrow-night'
+
+    set --universal fish_color_bg_normal 282a2e
+    set --universal fish_text_light 1d1f21
+    set --universal fish_text_dark 1d1f21
+
+    set --universal fish_color_cwd 81a2be
+    set --universal fish_color_failed cc6666
+    set --universal fish_color_jobs c5c8c6
+    set --universal fish_color_root cc6666
+    set --universal fish_color_remote f0c674
+    set --universal fish_color_user $fish_color_bg_normal
+    set --universal fish_color_venv b294bb
+
+    set --universal fish_color_git_clean b5bd68
+    set --universal fish_color_git_conflicted cc6666
+    set --universal fish_color_git_dirty f0c674
+
+    set --universal fish_color_vi_default de935f
+    set --universal fish_color_vi_insert b5bd68
+    set --universal fish_color_vi_replace b5bd68
+    set --universal fish_color_vi_visual b294bb
+end
+
+
+function __fish_set_colors_solarized -d 'Set Solarized Dark color theme'
+    set --universal fish_current_theme 'solarized-dark'
+
+    set --universal fish_color_bg_normal 073642
+    set --universal fish_text_light 002b36
+    set --universal fish_text_dark 002b36
+
+    set --universal fish_color_cwd 6c71c4
+    set --universal fish_color_failed dc322f
+    set --universal fish_color_jobs 657b83
+    set --universal fish_color_root dc322f
+    set --universal fish_color_remote b58900
+    set --universal fish_color_user $fish_color_bg_normal
+    set --universal fish_color_venv d33682
+
+    set --universal fish_color_git_clean 859900
+    set --universal fish_color_git_conflicted dc322f
+    set --universal fish_color_git_dirty b58900
+
+    set --universal fish_color_vi_default cb4b16
+    set --universal fish_color_vi_insert 859900
+    set --universal fish_color_vi_replace 2aa198
+    set --universal fish_color_vi_visual d33682
+end
+
+
+if not set --query __fish_current_theme; or set --query __fish_color_theme
+    # If user set theme is the same as current theme, do nothing
+    if test -z "$__fish_current_theme" -o "$__fish_current_theme" != "$__fish_color_theme"
+        __fish_set_color_theme "$__fish_color_theme"
+    end
 end
 
 
@@ -78,7 +161,7 @@ end
 
 function __prompt_end -d 'End the prompt'
         printf "%s " (__prompt_separator normal normal)
-        set -e prompt_head
+        set --erase prompt_head
 end
 
 
@@ -92,6 +175,7 @@ function fish_mode_prompt --description 'Displays the current mode'
         # Start the prompt, since vi mode always comes first
         __prompt_start "vi" normal
 
+        set_color $fish_text_light
         switch $fish_bind_mode
           case default
             set --global current_background $fish_color_vi_default
@@ -127,7 +211,7 @@ function __status_prompt -d "Show status of last command and background jobs"
     function __fish_prompt_jobs -d "Show the number of background jobs"
         set --local bg_jobs (jobs | wc --lines)
         if test "$bg_jobs" -gt 0
-            set_color $fish_text_light --background $fish_color_user
+            set_color $fish_color_jobs --background $fish_color_user
             printf "%s %s " $JOBS $bg_jobs
         end
     end
@@ -192,8 +276,7 @@ function __user_prompt -d "Write out the user prompt"
         end
 
         set_color --background $user_status_color
-        printf " %s%s%s%s " (__fish_prompt_status) (__fish_prompt_jobs)\
-                                (set_color $user_status_text) $USER
+        printf " %s%s " (set_color $user_status_text) $USER
     end
 end
 

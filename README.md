@@ -18,6 +18,8 @@ The prompt only shows information relevant to the context, so it won't clutter y
 
 ![Powerfish](prompt.png)
 
+And that's not all! You can choose from several different color themes - the default (above), Tomorrow Night or Solarized Dark.
+
 ## Install
 
 For best experience, you should use one of the [Powerline-patched fonts](https://github.com/Lokaltog/powerline-fonts).
@@ -40,6 +42,5 @@ Powerfish is licensed under GNU GPLv3.
 
 Immediate goals for Powerfish are:
 
-* support for multiple color themes (namely solarized and tomorrow night bright)
 * integrate to fisherman
 * show connection through telnet in red
