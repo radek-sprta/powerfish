@@ -1,3 +1,7 @@
+# name: Powerfish
+# description: Powerfish is an elegant and informative prompt for Fish.
+# author: Radek Sprta
+#
 # Configuration:
 # You can override some default options in ~/.config/fish/config.fish
 #
@@ -11,7 +15,6 @@
 #   set -g pf_color_theme default|tomorrow-night|solarized-dark
 
 # Characters
-
 function __pf_set_separator -d "Check for Powerline font and set separator"
     # If Powerline modified fonts are installed, use them for nicer output
     if type --quiet locate -a test -n (locate powerline)
@@ -40,7 +43,6 @@ end
 
 
 # Colors
-
 function __pf_set_color_theme -d 'Set color theme'
     # Argv[1]: Name of color theme to set
 
@@ -144,7 +146,6 @@ end
 
 
 # Prompt builders
-
 function __pf_prompt_segment -d 'Draw prompt segment'
     # Argv[1]: Head of prompt.
     # Argv[2]: Foreground color.
@@ -177,6 +178,7 @@ end
 function __pf_remove_count -d 'Remove count'
     printf "%s" (string replace --all --regex ' [0-9]' '' $argv[1])
 end
+
 
 function fish_mode_prompt --description 'Displays the current mode'
     # Do nothing if not in vi mode
@@ -269,11 +271,12 @@ function __pf_hostname_prompt -d "Write out the hostname prompt"
 	end
 
     # Only show remote hosts
-    set --local ppid (ps --format ppid= --pid %self | string trim)
-    switch (ps --format comm= --pid $ppid)
-    case sshd mosh-server
-        __pf_prompt_segment "host" $pf_text_dark $pf_color_remote
-        printf " at %s " $__pf_prompt_hostname
+    if set --local ppid (ps --format ppid= --pid %self | string trim)
+        switch (ps --format comm= --pid $ppid)
+        case sshd mosh-server
+            __pf_prompt_segment "host" $pf_text_dark $pf_color_remote
+            printf " at %s " $__pf_prompt_hostname
+        end
     end
 end
 
