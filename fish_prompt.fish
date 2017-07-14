@@ -135,16 +135,6 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
 end
 
 
-# Set color theme
-if not set --query pf_current_theme; or set --query pf_color_theme
-    # If user set theme is the same as current theme, do nothing
-    if test -z "$pf_current_theme" -o\
-        "$pf_current_theme" != "$pf_color_theme"
-        __pf_set_color_theme "$pf_color_theme"
-    end
-end
-
-
 # Prompt builders
 function __pf_prompt_segment -d 'Draw prompt segment'
     # Argv[1]: Head of prompt.
@@ -204,7 +194,7 @@ end
 function __pf_status_prompt -d "Show status of last command and background jobs"
 
     function __pf_command_status -d "Show if the last command failed"
-        if test $pf_last_status -ne 0
+        if test "$pf_last_status" -ne 0
             set_color $pf_color_failed
             printf "%s " $FAILED
         end
@@ -251,7 +241,7 @@ function __pf_user_prompt -d "Write out the user prompt"
         # Use different colors for normal user and root
         set --global pf_user_status_bg
         set --global pf_user_status_text $pf_text_light
-        if test (id -u $USER) -eq 0
+        if test (id -u "$USER") -eq 0
             set pf_user_status_bg $pf_color_root
         else
             set pf_user_status_bg $pf_color_user
@@ -315,7 +305,7 @@ function __pf_git_prompt -d "Write out the git prompt"
 
     function __pf_git_set_color -d 'Set color depending on the tree status'
         # If there are more lines than just the branch line, repo is dirty
-        if test (count $pf_git_status) -gt 1
+        if test (count "$pf_git_status") -gt 1
             if string match --regex 'U\?|\?U|DD|AA ' $pf_git_status >/dev/null
                 set --global pf_git_status_bg $pf_color_git_conflicted
                 set --global pf_git_status_text $pf_text_light
@@ -413,6 +403,14 @@ end
 function fish_prompt --description 'Write out the prompt'
     # Save the last status
     set --global pf_last_status $status
+
+    # Set color theme
+    if not set --query pf_current_theme; or set --query pf_color_theme
+        # If user set theme is the same as current theme, do nothing
+        if test -z "$pf_current_theme" -o "$pf_current_theme" != "$pf_color_theme"
+            __pf_set_color_theme "$pf_color_theme"
+        end
+    end
 
     # Disable virtual environment prompt; we have our own override
     set --universal VIRTUAL_ENV_DISABLE_PROMPT 1
