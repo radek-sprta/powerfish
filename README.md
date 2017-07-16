@@ -67,6 +67,8 @@ set -g pf_color_theme default|tomorrow-night|solarized-dark
 Immediate goals for Powerfish are:
 
 * show connection through telnet in red
+* show python version in virtual environment
+* show vagrant information
 
 ## License
 

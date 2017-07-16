@@ -283,14 +283,14 @@ function __pf_git_prompt -d "Write out the git prompt"
 
     function __pf_git_branch_name -d 'Get branch name'
         # Not on a branch
-        if string match --regex 'no branch' $pf_git_status >/dev/null
+        if string match --regex 'no branch' "$pf_git_status" >/dev/null
             printf "%s %s " $DETACHED (__pf_git_tag_or_hash)
         # Initial commit
-        else if set branch_name (string match --regex 'commit on (.*)' $pf_git_status)
+        else if set branch_name (string match --regex 'commit on (.*)' "$pf_git_status")
             printf "%s %s " $BRANCH $branch_name[2]
         # Otherwise get a branch name normally
         else
-            printf "%s %s " $BRANCH (string match --regex '## ([^.]*)' $pf_git_status)[2]
+            printf "%s %s " $BRANCH (string match --regex '## ([^.]*)' "$pf_git_status")[2]
         end
     end
 
@@ -306,7 +306,7 @@ function __pf_git_prompt -d "Write out the git prompt"
     function __pf_git_set_color -d 'Set color depending on the tree status'
         # If there are more lines than just the branch line, repo is dirty
         if test (count "$pf_git_status") -gt 1
-            if string match --regex 'U\?|\?U|DD|AA ' $pf_git_status >/dev/null
+            if string match --regex 'U\?|\?U|DD|AA ' "$pf_git_status" >/dev/null
                 set --global pf_git_status_bg $pf_color_git_conflicted
                 set --global pf_git_status_text $pf_text_light
             else
@@ -320,15 +320,15 @@ function __pf_git_prompt -d "Write out the git prompt"
     end
 
     function __pf_git_divergence -d 'Get divergence between local and remote'
-        set --local branch_info $pf_git_status[1]
-        set --local branch_ahead (string match --regex '\[ahead (\d*)' $branch_info)
-        set --local branch_behind (string match --regex 'behind (\d*)\]' $branch_info)
+        set --local branch_info "$pf_git_status[1]"
+        set --local branch_ahead (string match --regex '\[ahead (\d*)' "$branch_info")
+        set --local branch_behind (string match --regex 'behind (\d*)\]' "$branch_info")
         # Check how much we are ahead
-        if test (count $branch_ahead) -eq 2; and test $branch_ahead[2] -gt 0
+        if test (count "$branch_ahead") -eq 2; and test "$branch_ahead[2]" -gt 0
             set ahead "$AHEAD $branch_ahead[2]"
         end
         # Check how much we are behind
-        if test (count $branch_behind) -eq 2; and test $branch_behind[2] -gt 0
+        if test (count "$branch_behind") -eq 2; and test "$branch_behind[2]" -gt 0
             set behind "$BEHIND $branch_behind[2]"
         end
         if test -n "$ahead" -a -n "$behind"
@@ -349,7 +349,7 @@ function __pf_git_prompt -d "Write out the git prompt"
         # Get all info about branch
         for i in $pf_git_status
             # First two characters show the status
-            switch (echo $i | string sub --length 2)
+            switch (echo "$i" | string sub --length 2)
                 case "U?" "?U" "DD" "AA"
                     set conflicted (math $conflicted+1)
                 case "?M" "?D"
@@ -365,19 +365,19 @@ function __pf_git_prompt -d "Write out the git prompt"
         # Get number of stashed files
         set stashed (git stash list | wc --lines)
 
-        if test $untracked -gt 0
+        if test "$untracked" -gt 0
             set git_flags "$UNTRACKED $untracked "
         end
-        if test $modified -gt 0
+        if test "$modified" -gt 0
             set git_flags "$git_flags$MODIFIED $modified "
         end
-        if test $staged -gt 0
+        if test "$staged" -gt 0
             set git_flags "$git_flags$STAGED $staged "
         end
-        if test $conflicted -gt 0
+        if test "$conflicted" -gt 0
             set git_flags "$git_flags$CONFLICTED $conflicted "
         end
-        if test $stashed -gt 0
+        if test "$stashed" -gt 0
             set git_flags "$git_flags$STASHED $stashed "
         end
         if set --query git_flags
