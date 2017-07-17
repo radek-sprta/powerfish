@@ -324,11 +324,11 @@ function __pf_git_prompt -d "Write out the git prompt"
         set --local branch_ahead (string match --regex '\[ahead (\d*)' "$branch_info")
         set --local branch_behind (string match --regex 'behind (\d*)\]' "$branch_info")
         # Check how much we are ahead
-        if test (count "$branch_ahead") -eq 2; and test "$branch_ahead[2]" -gt 0
+        if test (count $branch_ahead) -eq 2; and test "$branch_ahead[2]" -gt 0
             set ahead "$AHEAD $branch_ahead[2]"
         end
         # Check how much we are behind
-        if test (count "$branch_behind") -eq 2; and test "$branch_behind[2]" -gt 0
+        if test (count $branch_behind) -eq 2; and test "$branch_behind[2]" -gt 0
             set behind "$BEHIND $branch_behind[2]"
         end
         if test -n "$ahead" -a -n "$behind"
