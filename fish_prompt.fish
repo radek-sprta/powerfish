@@ -305,8 +305,8 @@ function __pf_git_prompt -d "Write out the git prompt"
 
     function __pf_git_set_color -d 'Set color depending on the tree status'
         # If there are more lines than just the branch line, repo is dirty
-        if test (count "$pf_git_status") -gt 1
-            if string match --regex 'U\?|\?U|DD|AA ' "$pf_git_status" >/dev/null
+        if test (count $pf_git_status) -gt 1
+            if string match --regex 'U\? |\?U |DD |AA ' "$pf_git_status" >/dev/null
                 set --global pf_git_status_bg $pf_color_git_conflicted
                 set --global pf_git_status_text $pf_text_light
             else
