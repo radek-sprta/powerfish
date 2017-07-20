@@ -2,7 +2,7 @@
 
 Powerfish is an elegant and informative prompt for [Fish](https://github.com/fish-shell/fish-shell) inspired by [agnoster-zsh-theme](https://github.com/agnoster/agnoster-zsh-theme) and [Powerline](https://github.com/powerline/powerline). The prompt only shows information relevant to the context, so it won't clutter your screen. But enough talking, a picture is worth a thousand words:
 
-![Powerfish](prompt.png)
+![Powerfish](prompt.png)![Powerfish-Tomorrow-Night](prompt-tomorrow-night.png)
 
 ## Features
 
