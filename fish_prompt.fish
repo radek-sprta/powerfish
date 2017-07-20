@@ -290,7 +290,7 @@ function __pf_git_prompt -d "Write out the git prompt"
             printf "%s %s " $BRANCH $branch_name[2]
         # Otherwise get a branch name normally
         else
-            printf "%s %s " $BRANCH (string match --regex '## ([^.]*)' "$pf_git_status")[2]
+            printf "%s %s " $BRANCH (string match --regex '## ([^. ]+)' "$pf_git_status")[2]
         end
     end
 
