@@ -51,6 +51,8 @@ function __pf_set_color_theme -d 'Set color theme'
             __pf_colors_tomorrow
         case solarized-dark
             __pf_colors_solarized
+        case solarized-light
+            __pf_colors_solarized_light
         case "*"
             __pf_colors_default
     end
@@ -115,6 +117,31 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
     set --universal pf_color_bg_normal 073642
     set --universal pf_text_light 002b36
     set --universal pf_text_dark 002b36
+
+    set --universal pf_color_cwd 6c71c4
+    set --universal pf_color_failed dc322f
+    set --universal pf_color_jobs 657b83
+    set --universal pf_color_root dc322f
+    set --universal pf_color_remote b58900
+    set --universal pf_color_user $pf_color_bg_normal
+    set --universal pf_color_venv d33682
+
+    set --universal pf_color_git_clean 859900
+    set --universal pf_color_git_conflicted dc322f
+    set --universal pf_color_git_dirty b58900
+
+    set --universal pf_color_vi_default cb4b16
+    set --universal pf_color_vi_insert 859900
+    set --universal pf_color_vi_replace 2aa198
+    set --universal pf_color_vi_visual d33682
+end
+
+function __pf_colors_solarized_light -d 'Set Solarized Light color theme'
+    set --universal pf_current_theme 'solarized-light'
+
+    set --universal pf_color_bg_normal eee8d5
+    set --universal pf_text_light 586e75
+    set --universal pf_text_dark 586e75
 
     set --universal pf_color_cwd 6c71c4
     set --universal pf_color_failed dc322f
