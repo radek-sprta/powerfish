@@ -228,7 +228,7 @@ function __pf_status_prompt -d "Show status of last command and background jobs"
     end
 
     function __pf_jobs_status -d "Show the number of background jobs"
-        set --local bg_jobs (jobs | wc --lines)
+        set --local bg_jobs (jobs | wc -l)
         if test "$bg_jobs" -gt 0
             set_color $pf_color_jobs
             printf "%s %s " $JOBS $bg_jobs
@@ -390,7 +390,7 @@ function __pf_git_prompt -d "Write out the git prompt"
             end
         end
         # Get number of stashed files
-        set stashed (git stash list | wc --lines)
+        set stashed (git stash list | wc -l)
 
         if test "$untracked" -gt 0
             set git_flags "$UNTRACKED $untracked "
