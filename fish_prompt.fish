@@ -322,7 +322,7 @@ function __pf_git_prompt -d "Write out the git prompt"
     end
 
     function __pf_git_tag_or_hash -d 'Get tag or hash'
-        if set --local tag (git describe --tags --exact-match ^/dev/null)
+        if set --local tag (git describe --tags --exact-match 2>/dev/null)
             printf "%s" $tag
         else
             # Tag does not match, print a hash
@@ -413,7 +413,7 @@ function __pf_git_prompt -d "Write out the git prompt"
     end
 
     # Get git repo status
-    if set --global pf_git_status (git status --porcelain --branch --ignore-submodules=dirty ^/dev/null)
+    if set --global pf_git_status (git status --porcelain --branch --ignore-submodules=dirty 2>/dev/null)
         __pf_git_set_color
         __pf_prompt_segment "git" $pf_git_status_text $pf_git_status_bg
         if set --query pf_no_counters
