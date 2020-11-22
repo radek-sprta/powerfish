@@ -312,7 +312,10 @@ function __pf_git_prompt -d "Write out the git prompt"
         # Not on a branch
         if string match --regex 'no branch' "$pf_git_status" >/dev/null
             printf "%s %s " $DETACHED (__pf_git_tag_or_hash)
-        # Initial commit
+        # Empty repository with upstream
+        else if set branch_name (string match --regex 'commit(s yet)? on ([^ ?]*)\.\.\.' "$pf_git_status")
+            printf "%s %s " $BRANCH $branch_name[3]
+        # Emptry repository without upstream
         else if set branch_name (string match --regex 'commit(s yet)? on ([^ ?]*)' "$pf_git_status")
             printf "%s %s " $BRANCH $branch_name[3]
         # Branch with upstream
