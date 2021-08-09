@@ -17,7 +17,7 @@
 # Characters
 function __pf_set_separator -d "Check for Powerline font and set separator"
     # If Powerline modified fonts are installed, use them for nicer output
-    if type --quiet locate -a test -n (locate powerline)
+    if type -q locate -a test -n (locate powerline)
         set --universal SEPARATOR ''
     else
         set --universal SEPARATOR ''
@@ -306,7 +306,7 @@ end
 
 function __pf_git_prompt -d "Write out the git prompt"
     # Skip if git is not installed
-    type --quiet git; or return 1
+    type -q git; or return 1
 
     function __pf_git_branch_name -d 'Get branch name'
         # Not on a branch
