@@ -164,7 +164,7 @@ end
 
 # Prompt builders
 function __pf_prompt_segment -d 'Draw prompt segment'
-    # Argv[1]: Head of prompt.
+    # Argv[1]: Head of prompt. Leave empty, if you do not want to set it.
     # Argv[2]: Foreground color.
     # Argv[3]: Background color.
 
@@ -175,7 +175,9 @@ function __pf_prompt_segment -d 'Draw prompt segment'
 
     # Start the prompt if necessary, otherwise just draw separator
     if not set --query pf_prompt_head
-        set --global pf_prompt_head $head
+        if test -n "$head"
+            set --global pf_prompt_head $head
+        end
         set_color $fg --background $bg
     else
         printf "%s%s%s" (set_color $pf_current_background --background $bg)\
@@ -202,16 +204,16 @@ function fish_mode_prompt --description 'Displays the current mode'
     if test "$fish_key_bindings" = "fish_vi_key_bindings"
         switch $fish_bind_mode
           case default
-            __pf_prompt_segment "vi" $pf_text_light $pf_color_vi_default
+            __pf_prompt_segment "" $pf_text_light $pf_color_vi_default
             printf " %s " 'N'
           case insert
-            __pf_prompt_segment "vi" $pf_text_light $pf_color_vi_insert
+            __pf_prompt_segment "" $pf_text_light $pf_color_vi_insert
             printf " %s " 'I'
           case replace-one
-            __pf_prompt_segment "vi" $pf_text_light $pf_color_vi_replace
+            __pf_prompt_segment "" $pf_text_light $pf_color_vi_replace
             printf " %s " 'R'
           case visual
-            __pf_prompt_segment "vi" $pf_text_light $pf_color_vi_visual
+            __pf_prompt_segment "" $pf_text_light $pf_color_vi_visual
             printf " %s " 'V'
         end
     end
