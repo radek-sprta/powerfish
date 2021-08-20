@@ -260,6 +260,7 @@ end
 
 function __pf_vagrant_prompt -d "Write out Vagrant prompt"
     type -q vagrant; or return 1
+    __pf_find_vagrantfile; or return 1
     set --local vagrant_status (vagrant status --machine-readable | string match --all --regex 'state-human-short,(.*)' | string match --regex --invert '^state')
     # Do nothing if there is no Vagrant machine defined
     if test -n "$vagrant_status"
@@ -283,6 +284,17 @@ function __pf_vagrant_prompt -d "Write out Vagrant prompt"
         end
         printf " %s %s " $VAGRANT $state
     end
+end
+
+function __pf_find_vagrantfile -d "Check if parent dirs container Vagrantfile"
+    set --local directory (pwd)
+    while test $directory != '/'
+        if test -f "$directory/Vagrantfile"
+            return 0
+        end
+        set directory (dirname $directory)
+    end
+    return 1
 end
 
 
