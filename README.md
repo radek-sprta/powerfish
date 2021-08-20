@@ -12,6 +12,7 @@ Powerfish displays the following:
 * Flags:
     * failure of previous command
     * number of background jobs
+* Vagrant status
 * Virtual environment
 * User:
     * Non-default user
@@ -68,7 +69,6 @@ Immediate goals for Powerfish are:
 
 * show connection through telnet in red
 * show python version in virtual environment
-* show vagrant information
 
 ## License
 

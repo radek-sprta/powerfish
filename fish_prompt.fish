@@ -38,6 +38,7 @@ if not set --query __pf_characters_initialized
     set --universal STAGED '●'
     set --universal STASHED '⚑'
     set --universal UNTRACKED '…'
+    set --universal VAGRANT '𝙑'
     __pf_set_separator
 end
 
@@ -72,6 +73,7 @@ function __pf_colors_default -d 'Set default color theme'
     set --universal pf_color_root red
     set --universal pf_color_remote yellow
     set --universal pf_color_user $pf_color_bg_normal
+    set --universal pf_color_vagrant red
     set --universal pf_color_venv magenta
 
     set --universal pf_color_git_clean green
@@ -98,6 +100,7 @@ function __pf_colors_tomorrow -d 'Set Tommorrow Night color theme'
     set --universal pf_color_root cc6666
     set --universal pf_color_remote f0c674
     set --universal pf_color_user $pf_color_bg_normal
+    set --universal pf_color_vagrant cc6666
     set --universal pf_color_venv b294bb
 
     set --universal pf_color_git_clean b5bd68
@@ -124,6 +127,7 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
     set --universal pf_color_user $pf_color_bg_normal
+    set --universal pf_color_vagrant dc322f
     set --universal pf_color_venv d33682
 
     set --universal pf_color_git_clean 859900
@@ -149,6 +153,7 @@ function __pf_colors_solarized_light -d 'Set Solarized Light color theme'
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
     set --universal pf_color_user $pf_color_bg_normal
+    set --universal pf_color_vagrant dc322f
     set --universal pf_color_venv d33682
 
     set --universal pf_color_git_clean 859900
@@ -249,6 +254,34 @@ function __pf_status_prompt -d "Show status of last command and background jobs"
         else
             printf " %s%s" $command_status $jobs_status
         end
+    end
+end
+
+
+function __pf_vagrant_prompt -d "Write out Vagrant prompt"
+    type -q vagrant; or return 1
+    set --local vagrant_status (vagrant status --machine-readable | string match --all --regex 'state-human-short,(.*)' | string match --regex --invert '^state')
+    # Do nothing if there is no Vagrant machine defined
+    if test -n "$vagrant_status"
+        __pf_prompt_segment "vagrant" $pf_text_light $pf_color_vagrant
+        # Set the lowest state in case of multiple VMs
+        set --local state 'unknown'
+        if contains 'running' $vagrant_status
+            set state 'running'
+        end
+        if contains 'paused' $vagrant_status
+            set state 'paused'
+        end
+        if contains 'shutoff' $vagrant_status
+            set state 'shutoff'
+        end
+        if contains 'dead' $vagrant_status
+            set state 'dead'
+        end
+        if contains 'not created' $vagrant_status
+            set state 'not created'
+        end
+        printf " %s %s " $VAGRANT $state
     end
 end
 
@@ -450,8 +483,9 @@ function fish_prompt --description 'Write out the prompt'
     # Disable virtual environment prompt; we have our own override
     set --universal VIRTUAL_ENV_DISABLE_PROMPT 1
 
-	printf "%s%s%s%s%s%s" \
+	printf "%s%s%s%s%s%s%s" \
         (__pf_status_prompt)\
+        (__pf_vagrant_prompt)\
         (__pf_venv_prompt)\
         (__pf_user_prompt)\
         (__pf_hostname_prompt)\
