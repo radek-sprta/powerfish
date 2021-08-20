@@ -35,6 +35,7 @@ if not set --query __pf_characters_initialized
     set --universal FAILED '✘'
     set --universal JOBS '⚙'
     set --universal MODIFIED '✚'
+    set --universal NO_UPSTREAM 'L'
     set --universal PRIVATE '👓' 
     set --universal PYTHON '🐍' 
     set --universal STAGED '●'
@@ -372,15 +373,15 @@ function __pf_git_prompt -d "Write out the git prompt"
         # Empty repository with upstream
         else if set branch_name (string match --regex 'commit(s yet)? on ([^ ?]*)\.\.\.' "$pf_git_status")
             printf "%s %s " $BRANCH $branch_name[3]
-        # Emptry repository without upstream
+        # Empty repository without upstream
         else if set branch_name (string match --regex 'commit(s yet)? on ([^ ?]*)' "$pf_git_status")
-            printf "%s %s " $BRANCH $branch_name[3]
+            printf "%s%s %s " $BRANCH $NO_UPSTREAM $branch_name[3]
         # Branch with upstream
         else if set branch_name (string match --regex '## (.+)\.\.\.' "$pf_git_status")
             printf "%s %s " $BRANCH $branch_name[2]
         # Branch without upstream
         else
-            printf "%s %s " $BRANCH (string match --regex '## ([^ ]+)' "$pf_git_status")[2]
+            printf "%s%s %s " $BRANCH $NO_UPSTREAM (string match --regex '## ([^ ]+)' "$pf_git_status")[2]
         end
     end
 
