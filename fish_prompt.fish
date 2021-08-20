@@ -21,9 +21,11 @@ function powerfish --description 'Configure Powerfish'
     function __pf_help --description 'Print Powerfish help'
         echo "Usage: powerfish help"
         echo "       powerfish color COLOR"
+        echo "       powerfish counters true|false"
         echo ""
         echo "Options:"
-        echo "color      Choose theme (default, tomorrow-night, solarized-dark, solarized-light)"
+        echo "color      Choose theme [default, tomorrow-night, solarized-dark, solarized-light]"
+        echo "counter    Whether to show counters [default true]"
         echo "help       Show this help"
     end
 
@@ -33,6 +35,17 @@ function powerfish --description 'Configure Powerfish'
         case color
             set -e pf_color_theme
             set -U pf_color_theme "$argv[2]"
+        case counter
+            switch "$argv[2]"
+                case true
+                    set -e pf_no_counters
+                case false
+                    set -e pf_no_counters
+                    set -U pf_no_counters true
+                case "*"
+                    echo "Wrong argument"
+                    __pf_help
+            end
         case "*"
             echo "Wrong argument"
             __pf_help
