@@ -13,6 +13,7 @@ Powerfish displays the following:
     * private mode
     * failure of previous command
     * number of background jobs
+* Kubernetes context
 * Vagrant status
 * Python virtual environment
 * User:

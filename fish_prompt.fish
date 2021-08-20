@@ -34,6 +34,7 @@ if not set --query __pf_characters_initialized
     set --universal DETACHED '➦'
     set --universal FAILED '✘'
     set --universal JOBS '⚙'
+    set --universal KUBERNETES '⎈'
     set --universal MODIFIED '✚'
     set --universal NO_UPSTREAM 'L'
     set --universal PRIVATE '👓' 
@@ -73,6 +74,7 @@ function __pf_colors_default -d 'Set default color theme'
     set --universal pf_color_cwd blue
     set --universal pf_color_failed red
     set --universal pf_color_jobs $pf_text_light
+    set --universal pf_color_kubernetes magenta
     set --universal pf_color_root red
     set --universal pf_color_remote yellow
     set --universal pf_color_user $pf_color_bg_normal
@@ -100,6 +102,7 @@ function __pf_colors_tomorrow -d 'Set Tommorrow Night color theme'
     set --universal pf_color_cwd 81a2be
     set --universal pf_color_failed cc6666
     set --universal pf_color_jobs c5c8c6
+    set --universal pf_color_kubernetes b294bb
     set --universal pf_color_root cc6666
     set --universal pf_color_remote f0c674
     set --universal pf_color_user $pf_color_bg_normal
@@ -127,6 +130,7 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
     set --universal pf_color_cwd 6c71c4
     set --universal pf_color_failed dc322f
     set --universal pf_color_jobs 657b83
+    set --universal pf_color_kubernetes d33682
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
     set --universal pf_color_user $pf_color_bg_normal
@@ -143,6 +147,7 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
     set --universal pf_color_vi_visual d33682
 end
 
+
 function __pf_colors_solarized_light -d 'Set Solarized Light color theme'
     set --universal pf_current_theme 'solarized-light'
 
@@ -153,6 +158,7 @@ function __pf_colors_solarized_light -d 'Set Solarized Light color theme'
     set --universal pf_color_cwd 6c71c4
     set --universal pf_color_failed dc322f
     set --universal pf_color_jobs 657b83
+    set --universal pf_color_kubernetes d33682
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
     set --universal pf_color_user $pf_color_bg_normal
@@ -264,6 +270,17 @@ function __pf_status_prompt -d "Show status of last command and background jobs"
         else
             printf " %s%s%s" $private_mode $command_status $jobs_status
         end
+    end
+end
+
+
+function __pf_kubernetes_prompt -d "Write out Kubernetes context"
+    type -q kubectl; or return 1
+    set --local kubernetes_context (kubectl config current-context 2>/dev/null)
+    # Do nothing if there is no kubernetes context
+    if test -n "$kubernetes_context"
+        __pf_prompt_segment "kubernetes" $pf_text_light $pf_color_kubernetes
+        printf " %s %s " $KUBERNETES $kubernetes_context
     end
 end
 
@@ -502,8 +519,9 @@ function fish_prompt --description 'Write out the prompt'
     # Disable virtual environment prompt; we have our own override
     set --universal VIRTUAL_ENV_DISABLE_PROMPT 1
 
-	printf "%s%s%s%s%s%s%s" \
+	printf "%s%s%s%s%s%s%s%s" \
         (__pf_status_prompt)\
+        (__pf_kubernetes_prompt)\
         (__pf_vagrant_prompt)\
         (__pf_venv_prompt)\
         (__pf_user_prompt)\
