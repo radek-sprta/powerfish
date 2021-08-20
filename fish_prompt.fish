@@ -12,7 +12,7 @@
 #   set -g pf_no_counters true
 #
 #   # Change the color theme
-#   set -g pf_color_theme default|tomorrow-night|solarized-dark
+#   set -g pf_color_theme default|tomorrow-night|solarized-dark|solarized-light
 
 # Characters
 function __pf_set_separator -d "Check for Powerline font and set separator"

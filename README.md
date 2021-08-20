@@ -57,18 +57,12 @@ You can override some of the default options in your `config.fish`:
 ```fish
 set -g DEFAULT_USER username
 set -g pf_no_counters true
-set -g pf_color_theme default|tomorrow-night|solarized-dark
+set -g pf_color_theme default|tomorrow-night|solarized-dark|solarized-light
 ```
 
 - `set -g DEFAULT_USER username` hides the default username.
 - `set -g pf_no_counters` hides the counter for git files, jobs etc.
-- `set -g pf_color_theme` change the color theme to `tomorrow-night`, `solarized-dark` or back to `default`
-
-## What is coming next?
-
-Immediate goals for Powerfish are:
-
-* show connection through telnet in red
+- `set -g pf_color_theme` change the color theme to `tomorrow-night`, `solarized-dark`, `solarized-light` or back to `default`
 
 ## License
 
