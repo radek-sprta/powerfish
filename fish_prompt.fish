@@ -279,17 +279,13 @@ function __pf_vagrant_prompt -d "Write out Vagrant prompt"
         set --local state 'unknown'
         if contains 'running' $vagrant_status
             set state 'running'
-        end
-        if contains 'paused' $vagrant_status
+        else if contains 'paused' $vagrant_status
             set state 'paused'
-        end
-        if contains 'shutoff' $vagrant_status
+        else if contains 'shutoff' $vagrant_status
             set state 'shutoff'
-        end
-        if contains 'dead' $vagrant_status
+        else if contains 'dead' $vagrant_status
             set state 'dead'
-        end
-        if contains 'not created' $vagrant_status
+        else if contains 'not created' $vagrant_status
             set state 'not created'
         end
         printf " %s %s " $VAGRANT $state
