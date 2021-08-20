@@ -14,6 +14,7 @@ Powerfish displays the following:
     * failure of previous command
     * number of background jobs
 * Kubernetes context
+* Terraform workspace
 * Vagrant status
 * Python virtual environment
 * User:

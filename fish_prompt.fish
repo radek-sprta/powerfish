@@ -41,6 +41,7 @@ if not set --query __pf_characters_initialized
     set --universal PYTHON '🐍' 
     set --universal STAGED '●'
     set --universal STASHED '⚑'
+    set --universal TERRRAFORM '𐌕'
     set --universal UNTRACKED '…'
     set --universal VAGRANT '𝙑'
     __pf_set_separator
@@ -77,6 +78,7 @@ function __pf_colors_default -d 'Set default color theme'
     set --universal pf_color_kubernetes magenta
     set --universal pf_color_root red
     set --universal pf_color_remote yellow
+    set --universal pf_color_terraform magenta
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant red
     set --universal pf_color_venv magenta
@@ -105,6 +107,7 @@ function __pf_colors_tomorrow -d 'Set Tommorrow Night color theme'
     set --universal pf_color_kubernetes b294bb
     set --universal pf_color_root cc6666
     set --universal pf_color_remote f0c674
+    set --universal pf_color_terraform b294bb
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant cc6666
     set --universal pf_color_venv b294bb
@@ -133,6 +136,7 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
     set --universal pf_color_kubernetes d33682
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
+    set --universal pf_color_terraform d33682
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant dc322f
     set --universal pf_color_venv d33682
@@ -161,6 +165,7 @@ function __pf_colors_solarized_light -d 'Set Solarized Light color theme'
     set --universal pf_color_kubernetes d33682
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
+    set --universal pf_color_terraform d33682
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant dc322f
     set --universal pf_color_venv d33682
@@ -281,6 +286,18 @@ function __pf_kubernetes_prompt -d "Write out Kubernetes context"
     if test -n "$kubernetes_context"
         __pf_prompt_segment "kubernetes" $pf_text_light $pf_color_kubernetes
         printf " %s %s " $KUBERNETES $kubernetes_context
+    end
+end
+
+
+function __pf_terraform_prompt -d "Write out Terraform workspace"
+    type -q terraform; or return 1
+    test -d '.terraform'; or return 1
+    set --local terraform_status (terraform workspace show 2>/dev/null)
+    # Do nothing if there is no kubernetes context
+    if test -n "$terraform_status"
+        __pf_prompt_segment "terraform" $pf_text_light $pf_color_terraform
+        printf " %s %s " $TERRAFORM $terraform_status
     end
 end
 
@@ -519,9 +536,10 @@ function fish_prompt --description 'Write out the prompt'
     # Disable virtual environment prompt; we have our own override
     set --universal VIRTUAL_ENV_DISABLE_PROMPT 1
 
-	printf "%s%s%s%s%s%s%s%s" \
+	printf "%s%s%s%s%s%s%s%s%s" \
         (__pf_status_prompt)\
         (__pf_kubernetes_prompt)\
+        (__pf_terraform_prompt)\
         (__pf_vagrant_prompt)\
         (__pf_venv_prompt)\
         (__pf_user_prompt)\
