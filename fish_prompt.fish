@@ -13,6 +13,31 @@
 #
 #   # Change the color theme
 #   set -g pf_color_theme default|tomorrow-night|solarized-dark|solarized-light
+#
+function powerfish --description 'Configure Powerfish'
+    # Argv[1]: Subcommand to run.
+    # Argv[2]: Optional subocommand argument.
+
+    function __pf_help --description 'Print Powerfish help'
+        echo "Usage: powerfish help"
+        echo "       powerfish color COLOR"
+        echo ""
+        echo "Options:"
+        echo "color      Choose theme (default, tomorrow-night, solarized-dark, solarized-light)"
+        echo "help       Show this help"
+    end
+
+    switch "$argv[1]"
+        case help
+            __pf_help
+        case color
+            set -e pf_color_theme
+            set -U pf_color_theme "$argv[2]"
+        case "*"
+            echo "Wrong argument"
+            __pf_help
+    end
+end
 
 # Characters
 function __pf_set_separator -d "Check for Powerline font and set separator"

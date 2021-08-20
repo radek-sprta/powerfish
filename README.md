@@ -29,7 +29,7 @@ Powerfish displays the following:
     * Number of commits ahead/behind remote
     * Number of untracked/modified/staged/conflicted/stashed files
 
-And that's not all! You can choose from several different color themes - the default (on the picture), Tomorrow Night or Solarized Dark.
+And that's not all! You can choose from several different color themes - the default (on the picture), Tomorrow Night, Solarized Dark or Solarized Light.
 
 ## Install
 
@@ -66,6 +66,17 @@ set -g pf_color_theme default|tomorrow-night|solarized-dark|solarized-light
 - `set -g DEFAULT_USER username` hides the default username.
 - `set -g pf_no_counters` hides the counter for git files, jobs etc.
 - `set -g pf_color_theme` change the color theme to `tomorrow-night`, `solarized-dark`, `solarized-light` or back to `default`
+
+Alternatively, you can use powerfish command to set these.
+
+```
+Usage: powerfish help
+       powerfish color COLOR
+
+Options:
+color      Choose theme (default, tomorrow-night, solarized-dark, solarized-light)
+help       Show this help
+```
 
 ## License
 
