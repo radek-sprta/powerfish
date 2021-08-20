@@ -86,7 +86,9 @@ if not set --query __pf_characters_initialized
     set --universal TERRRAFORM '𐌕'
     set --universal UNTRACKED '…'
     set --universal VAGRANT '𝙑'
-    __pf_set_separator
+    if not set --query SEPARATOR
+        set --universal SEPARATOR 
+    end
 end
 
 
