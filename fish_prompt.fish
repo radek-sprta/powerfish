@@ -39,6 +39,7 @@ if not set --query __pf_characters_initialized
     set --universal STASHED '⚑'
     set --universal UNTRACKED '…'
     set --universal VAGRANT '𝙑'
+    set --universal PYTHON '🐍' 
     __pf_set_separator
 end
 
@@ -301,8 +302,9 @@ end
 function __pf_venv_prompt -d "Write out virtual environment prompt"
     # Do nothing if not in virtual environment
     if test -n "$VIRTUAL_ENV"
+        set python_version (python --version | string match --regex '[0-9]\.[0-9]')
         __pf_prompt_segment "venv" $pf_text_light $pf_color_venv
-        printf " %s " (basename $VIRTUAL_ENV)
+        printf " %s%s %s " $PYTHON $python_version (basename $VIRTUAL_ENV)
     end
 end
 

@@ -13,7 +13,7 @@ Powerfish displays the following:
     * failure of previous command
     * number of background jobs
 * Vagrant status
-* Virtual environment
+* Python virtual environment
 * User:
     * Non-default user
     * Elevated priviledges
@@ -68,7 +68,6 @@ set -g pf_color_theme default|tomorrow-night|solarized-dark
 Immediate goals for Powerfish are:
 
 * show connection through telnet in red
-* show python version in virtual environment
 
 ## License
 
