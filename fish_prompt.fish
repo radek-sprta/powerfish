@@ -35,11 +35,12 @@ if not set --query __pf_characters_initialized
     set --universal FAILED '✘'
     set --universal JOBS '⚙'
     set --universal MODIFIED '✚'
+    set --universal PRIVATE '👓' 
+    set --universal PYTHON '🐍' 
     set --universal STAGED '●'
     set --universal STASHED '⚑'
     set --universal UNTRACKED '…'
     set --universal VAGRANT '𝙑'
-    set --universal PYTHON '🐍' 
     __pf_set_separator
 end
 
@@ -228,6 +229,12 @@ end
 
 function __pf_status_prompt -d "Show status of last command and background jobs"
 
+    function __pf_private_mode -d "Show if private mode is on"
+        if test -n "$fish_private_mode"
+            printf "%s " $PRIVATE
+        end
+    end
+
     function __pf_command_status -d "Show if the last command failed"
         if test "$pf_last_status" -ne 0
             set_color $pf_color_failed
@@ -243,17 +250,18 @@ function __pf_status_prompt -d "Show status of last command and background jobs"
         end
     end
 
+    set --local private_mode (__pf_private_mode)
     set --local command_status (__pf_command_status)
     set --local jobs_status (__pf_jobs_status)
 
     # If there is nothing to show, dont draw the prompt
-    if test -n "$command_status" -o -n "$jobs_status"
+    if test -n "$private_mode" -o -n "$command_status" -o -n "$jobs_status"
 
         __pf_prompt_segment "status" $pf_text_light $pf_color_user
         if set --query pf_no_counters
-            printf " %s%s" $command_status (__pf_remove_count $jobs_status)
+            printf " %s%s%s" $private_mode $command_status (__pf_remove_count $jobs_status)
         else
-            printf " %s%s" $command_status $jobs_status
+            printf " %s%s%s" $private_mode $command_status $jobs_status
         end
     end
 end

@@ -10,6 +10,7 @@ Powerfish displays the following:
 
 * Current Vi mode
 * Flags:
+    * private mode
     * failure of previous command
     * number of background jobs
 * Vagrant status
