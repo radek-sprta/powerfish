@@ -37,8 +37,9 @@ if not set --query __pf_characters_initialized
     set --universal KUBERNETES '⎈'
     set --universal MODIFIED '✚'
     set --universal NO_UPSTREAM 'L'
-    set --universal PRIVATE '👓' 
-    set --universal PYTHON '🐍' 
+    set --universal PRIVATE '👓'
+    set --universal PYTHON '🐍'
+    set --universal RUBY '💎'
     set --universal STAGED '●'
     set --universal STASHED '⚑'
     set --universal TERRRAFORM '𐌕'
@@ -78,6 +79,7 @@ function __pf_colors_default -d 'Set default color theme'
     set --universal pf_color_kubernetes magenta
     set --universal pf_color_root red
     set --universal pf_color_remote yellow
+    set --universal pf_color_ruby red
     set --universal pf_color_terraform magenta
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant red
@@ -107,6 +109,7 @@ function __pf_colors_tomorrow -d 'Set Tommorrow Night color theme'
     set --universal pf_color_kubernetes b294bb
     set --universal pf_color_root cc6666
     set --universal pf_color_remote f0c674
+    set --universal pf_color_ruby cc6666
     set --universal pf_color_terraform b294bb
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant cc6666
@@ -136,6 +139,7 @@ function __pf_colors_solarized -d 'Set Solarized Dark color theme'
     set --universal pf_color_kubernetes d33682
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
+    set --universal pf_color_ruby dc322f
     set --universal pf_color_terraform d33682
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant dc322f
@@ -165,6 +169,7 @@ function __pf_colors_solarized_light -d 'Set Solarized Light color theme'
     set --universal pf_color_kubernetes d33682
     set --universal pf_color_root dc322f
     set --universal pf_color_remote b58900
+    set --universal pf_color_ruby dc322f
     set --universal pf_color_terraform d33682
     set --universal pf_color_user $pf_color_bg_normal
     set --universal pf_color_vagrant dc322f
@@ -344,6 +349,15 @@ function __pf_venv_prompt -d "Write out virtual environment prompt"
         set python_version (python --version | string match --regex '[0-9]\.[0-9]')
         __pf_prompt_segment "venv" $pf_text_light $pf_color_venv
         printf " %s%s %s " $PYTHON $python_version (basename $VIRTUAL_ENV)
+    end
+end
+
+
+function __pf_ruby_prompt -d "Write out ruby environment prompt"
+    # Do nothing if Ruby version is not set
+    if test -n "$RUBY_VERSION"
+        __pf_prompt_segment "ruby" $pf_text_light $pf_color_ruby
+        printf " %s %s " $RUBY $RUBY_VERSION
     end
 end
 
@@ -536,12 +550,13 @@ function fish_prompt --description 'Write out the prompt'
     # Disable virtual environment prompt; we have our own override
     set --universal VIRTUAL_ENV_DISABLE_PROMPT 1
 
-	printf "%s%s%s%s%s%s%s%s%s" \
+	printf "%s%s%s%s%s%s%s%s%s%s" \
         (__pf_status_prompt)\
         (__pf_kubernetes_prompt)\
         (__pf_terraform_prompt)\
         (__pf_vagrant_prompt)\
         (__pf_venv_prompt)\
+        (__pf_ruby_prompt)\
         (__pf_user_prompt)\
         (__pf_hostname_prompt)\
         (__pf_cwd_prompt)\

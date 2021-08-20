@@ -17,6 +17,7 @@ Powerfish displays the following:
 * Terraform workspace
 * Vagrant status
 * Python virtual environment
+* Ruby version
 * User:
     * Non-default user
     * Elevated priviledges
