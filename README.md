@@ -73,12 +73,14 @@ Alternatively, you can use powerfish command to set these.
 Usage: powerfish help
        powerfish color COLOR
        powerfish counters true|false
+       powerfish separator SEPARATOR
        powerfish user USER
 
 Options:
 color      Choose theme (default, tomorrow-night, solarized-dark, solarized-light)
 counter    Whether to show counters [default true]
 help       Show this help
+separator  Configure prompt separator [such as ; leave empty for flat separation]
 user       Set the default user
 ```
 

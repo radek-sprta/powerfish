@@ -22,12 +22,14 @@ function powerfish --description 'Configure Powerfish'
         echo "Usage: powerfish help"
         echo "       powerfish color COLOR"
         echo "       powerfish counters true|false"
+        echo "       powerfish separator SEPARATOR"
         echo "       powerfish user USER"
         echo ""
         echo "Options:"
         echo "color      Choose theme [default, tomorrow-night, solarized-dark, solarized-light]"
         echo "counter    Whether to show counters [default true]"
         echo "help       Show this help"
+        echo "separator  Configure prompt separator [such as ; leave empty for flat separation]"
         echo "user       Set the default user"
     end
 
@@ -48,22 +50,18 @@ function powerfish --description 'Configure Powerfish'
                     echo "Wrong argument"
                     __pf_help
             end
+        case separator
+            if test -n "$argv[2]"
+                set --universal SEPARATOR "$argv[2]"
+            else
+                set --universal SEPARATOR ''
+            end
         case user
             set -e DEFAULT_USER
             set -U DEFAULT_USER "$argv[2]"
         case "*"
             echo "Wrong argument"
             __pf_help
-    end
-end
-
-# Characters
-function __pf_set_separator -d "Check for Powerline font and set separator"
-    # If Powerline modified fonts are installed, use them for nicer output
-    if type -q locate -a test -n (locate powerline)
-        set --universal SEPARATOR ''
-    else
-        set --universal SEPARATOR ''
     end
 end
 
