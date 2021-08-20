@@ -26,7 +26,7 @@ end
 
 
 if not set --query __pf_characters_initialized
-    set --universal __pf_characters_initialized
+    set --global --export __pf_characters_initialized
     set --universal AHEAD '⬆'
     set --universal BEHIND '⬇'
     set --universal BRANCH ''
