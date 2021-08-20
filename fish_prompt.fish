@@ -22,11 +22,13 @@ function powerfish --description 'Configure Powerfish'
         echo "Usage: powerfish help"
         echo "       powerfish color COLOR"
         echo "       powerfish counters true|false"
+        echo "       powerfish user USER"
         echo ""
         echo "Options:"
         echo "color      Choose theme [default, tomorrow-night, solarized-dark, solarized-light]"
         echo "counter    Whether to show counters [default true]"
         echo "help       Show this help"
+        echo "user       Set the default user"
     end
 
     switch "$argv[1]"
@@ -46,6 +48,9 @@ function powerfish --description 'Configure Powerfish'
                     echo "Wrong argument"
                     __pf_help
             end
+        case user
+            set -e DEFAULT_USER
+            set -U DEFAULT_USER "$argv[2]"
         case "*"
             echo "Wrong argument"
             __pf_help
