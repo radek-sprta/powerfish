@@ -390,12 +390,9 @@ function __pf_hostname_prompt -d "Write out the hostname prompt"
 	end
 
     # Only show remote hosts
-    if set --local ppid (ps -o ppid= -p %self | string trim)
-        switch (ps -o comm= -p $ppid)
-        case sshd mosh-server
-            __pf_prompt_segment "host" $pf_text_dark $pf_color_remote
-            printf " at %s " $__pf_prompt_hostname
-        end
+    if test -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY"
+        __pf_prompt_segment "host" $pf_text_dark $pf_color_remote
+        printf " at %s " $__pf_prompt_hostname
     end
 end
 
