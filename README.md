@@ -1,3 +1,26 @@
+**This repository is no longer maintained. I recommend using [Tide](https://github.com/IlanCosman/tide) as a faster and more featureful alternative. To make it look close to Powerfish, you can use the following settings:**
+
+```fish
+set -g tide_left_prompt_items vi_mode context pwd terraform virtual_env rustc git
+set -g tide_right_prompt_items status jobs
+set -g tide_pwd_color_anchors black
+set -g tide_pwd_color_dirs black
+set -g tide_pwd_color_truncated_dirs black
+set -g tide_vi_mode_bg_color_default brred
+set -g tide_vi_mode_color_default black
+set -g tide_vi_mode_icon_default N
+set -g tide_vi_mode_bg_color_insert green
+set -g tide_vi_mode_color_insert black
+set -g tide_vi_mode_icon_insert I
+set -g tide_vi_mode_bg_color_replace yellow
+set -g tide_vi_mode_color_replace black
+set -g tide_vi_mode_icon_replace R
+set -g tide_vi_mode_bg_color_visual brmagenta
+set -g tide_vi_mode_color_visual black
+set -g tide_vi_mode_icon_visual V
+set -g tide_virtual_env_icon '🐍'
+```
+
 # Powerfish
 
 Powerfish is an elegant and informative prompt for [Fish](https://github.com/fish-shell/fish-shell) inspired by [agnoster-zsh-theme](https://github.com/agnoster/agnoster-zsh-theme) and [Powerline](https://github.com/powerline/powerline). The prompt only shows information relevant to the context, so it won't clutter your screen. But enough talking, a picture is worth a thousand words:
